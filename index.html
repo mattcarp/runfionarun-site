@@ -3,630 +3,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Run Fiona Run — Gozo Half Marathon Companion</title>
-    <meta name="description" content="Your personal companion for the Gozo Half Marathon. Live GPS tracking, voice alerts, spectator mode, and more.">
+    <title>Run Fiona Run — Gozo Half Marathon</title>
+    <meta name="description" content="Your personal companion for the Gozo Half Marathon. Live GPS, voice alerts, spectator mode. April 26, 2026 — Xagħra Square.">
+    <meta property="og:title" content="Run Fiona Run">
+    <meta property="og:description" content="Gozo Half Marathon companion app — live GPS, voice alerts, spectator mode.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://runfionarun.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         :root {
             --cyan: #00BCD4;
-            --cyan-dark: #0097A7;
+            --cyan-glow: rgba(0, 188, 212, 0.15);
             --coral: #FF6B6B;
-            --coral-dark: #EE5A5A;
-            --bg-dark: #0A0E17;
-            --bg-card: #111827;
-            --text-primary: #F9FAFB;
-            --text-secondary: #9CA3AF;
-            --text-muted: #6B7280;
-            --gradient-start: #00BCD4;
-            --gradient-end: #FF6B6B;
+            --coral-glow: rgba(255, 107, 107, 0.12);
+            --amber: #F59E0B;
+            --emerald: #10B981;
+            --violet: #8B5CF6;
+            --rose: #F43E5E;
+            --bg: #060A13;
+            --bg-card: #0D1321;
+            --bg-card-hover: #111B2E;
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(0,188,212,0.25);
+            --text: #F1F5F9;
+            --text-2: #94A3B8;
+            --text-3: #64748B;
         }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ═══ NAV ═══ */
+        nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(6,10,19,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+        .nav-logo{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .nav-links{display:flex;gap:2rem;list-style:none}
+        .nav-links a{color:var(--text-2);text-decoration:none;font-size:.85rem;font-weight:500;letter-spacing:.02em;transition:color .2s}
+        .nav-links a:hover{color:var(--cyan)}
+        @media(max-width:640px){.nav-links{display:none}}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
+        /* ═══ HERO ═══ */
+        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+        .hero::before{content:'';position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,var(--cyan-glow),transparent 70%);top:-200px;right:-200px;animation:float 15s ease-in-out infinite alternate}
+        .hero::after{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,var(--coral-glow),transparent 70%);bottom:-100px;left:-150px;animation:float 18s ease-in-out infinite alternate-reverse}
+        @keyframes float{0%{transform:translate(0,0)}100%{transform:translate(30px,-20px)}}
 
-        /* Hero */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
+        .hero-inner{position:relative;z-index:1;max-width:1200px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+        @media(max-width:900px){.hero-inner{grid-template-columns:1fr;text-align:center}}
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(ellipse at 30% 20%, rgba(0, 188, 212, 0.08) 0%, transparent 50%),
-                        radial-gradient(ellipse at 70% 80%, rgba(255, 107, 107, 0.06) 0%, transparent 50%);
-            animation: drift 20s ease-in-out infinite alternate;
-        }
+        .hero-text .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem 1rem;border:1px solid rgba(0,188,212,.2);border-radius:100px;font-size:.75rem;font-weight:600;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;background:rgba(0,188,212,.06)}
+        .badge .pulse{width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-        @keyframes drift {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-2%, 2%) rotate(1deg); }
-        }
+        .hero-text h1{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,7vw,6rem);font-weight:800;line-height:1;margin-bottom:1.5rem}
+        .hero-text h1 .gradient{background:linear-gradient(135deg,var(--text) 20%,var(--cyan) 60%,var(--coral) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .hero-text h1 em{font-family:'Playfair Display',serif;font-style:italic;background:linear-gradient(135deg,var(--coral),#FF8A80);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .hero-sub{font-size:1.15rem;font-weight:300;color:var(--text-2);line-height:1.7;margin-bottom:2rem;max-width:480px}
+        @media(max-width:900px){.hero-sub{margin:0 auto 2rem}}
 
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 720px;
-        }
+        .hero-stats{display:flex;gap:2.5rem;margin-bottom:2.5rem;flex-wrap:wrap}
+        @media(max-width:900px){.hero-stats{justify-content:center}}
+        .hero-stat-val{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .hero-stat-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3)}
 
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 1rem;
-            background: rgba(0, 188, 212, 0.1);
-            border: 1px solid rgba(0, 188, 212, 0.25);
-            border-radius: 100px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--cyan);
-            margin-bottom: 2rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
+        .hero-cta{display:flex;gap:1rem;flex-wrap:wrap}
+        @media(max-width:900px){.hero-cta{justify-content:center}}
+        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:14px;font-size:.95rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:all .25s}
+        .btn-primary{background:linear-gradient(135deg,var(--cyan),#0097A7);color:#fff;box-shadow:0 4px 24px rgba(0,188,212,.25)}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,188,212,.35)}
+        .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border)}
+        .btn-ghost:hover{background:rgba(255,255,255,.08);transform:translateY(-2px)}
 
-        .hero-badge .dot {
-            width: 6px;
-            height: 6px;
-            background: var(--cyan);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
+        /* Phone mockup */
+        .hero-visual{display:flex;justify-content:center;position:relative}
+        .phone-frame{width:280px;height:580px;border-radius:40px;border:3px solid rgba(255,255,255,.1);background:var(--bg-card);position:relative;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.1)}
+        .phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:28px;background:var(--bg);border-radius:0 0 16px 16px;z-index:2}
+        .phone-screen{position:absolute;inset:3px;border-radius:37px;overflow:hidden}
+        .phone-screen-content{width:100%;height:100%;background:linear-gradient(180deg,#0A1628 0%,#0D1F3C 30%,#0A1628 100%);display:flex;flex-direction:column;padding-top:36px}
+        .screen-map{flex:1;background:linear-gradient(135deg,#1a2744 0%,#0d1f3c 50%,#162238 100%);position:relative;overflow:hidden}
+        .screen-map .route-line{position:absolute;top:15%;left:10%;width:80%;height:60%;border:2px solid var(--cyan);border-radius:40% 60% 50% 40%;opacity:.6;transform:rotate(-15deg)}
+        .screen-map .runner-dot{position:absolute;top:35%;left:55%;width:14px;height:14px;background:var(--coral);border-radius:50%;box-shadow:0 0 12px var(--coral);animation:runner-pulse 2s ease-in-out infinite}
+        @keyframes runner-pulse{0%,100%{transform:scale(1);box-shadow:0 0 12px var(--coral)}50%{transform:scale(1.3);box-shadow:0 0 20px var(--coral)}}
+        .screen-map .km-dot{position:absolute;width:8px;height:8px;background:rgba(255,255,255,.3);border-radius:50%}
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
+        .screen-hud{background:rgba(13,19,33,.95);backdrop-filter:blur(10px);padding:12px 16px;border-top:1px solid var(--border)}
+        .hud-title{font-size:.65rem;font-weight:600;color:var(--text-2);margin-bottom:6px}
+        .hud-stats{display:flex;justify-content:space-between}
+        .hud-stat{text-align:center}
+        .hud-stat-val{font-size:.9rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)}
+        .hud-stat-lbl{font-size:.55rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em}
+        .hud-buttons{display:flex;gap:8px;margin-top:10px}
+        .hud-btn{flex:1;padding:8px;border-radius:10px;text-align:center;font-size:.7rem;font-weight:600;color:#fff}
+        .hud-btn-start{background:var(--cyan)}
+        .hud-btn-spectate{background:rgba(255,255,255,.08);border:1px solid var(--border)}
 
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 8vw, 5.5rem);
-            font-weight: 700;
-            line-height: 1.05;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--cyan) 50%, var(--coral) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        /* Floating elements around phone */
+        .float-badge{position:absolute;padding:.5rem 1rem;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);font-size:.75rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:3}
+        .float-badge.top-left{top:40px;left:-60px;animation:bob 4s ease-in-out infinite}
+        .float-badge.top-right{top:100px;right:-50px;animation:bob 5s ease-in-out infinite .5s}
+        .float-badge.bot-left{bottom:120px;left:-40px;animation:bob 4.5s ease-in-out infinite 1s}
+        @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @media(max-width:900px){.float-badge{display:none}}
 
-        .hero h1 em {
-            font-style: italic;
-            background: linear-gradient(135deg, var(--coral) 0%, var(--coral-dark) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        /* ═══ COUNTDOWN ═══ */
+        .countdown-bar{background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:2.5rem 2rem;text-align:center}
+        .countdown-label{font-size:.8rem;text-transform:uppercase;letter-spacing:.15em;color:var(--text-3);margin-bottom:1rem}
+        .countdown-grid{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+        .cd-unit{min-width:80px;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:14px}
+        .cd-num{font-size:2.5rem;font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .cd-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-top:.2rem}
+        .cd-race-info{margin-top:1rem;font-size:.9rem;color:var(--text-2)}
+        .cd-race-info strong{color:var(--text)}
 
-        .hero-subtitle {
-            font-size: clamp(1.1rem, 2.5vw, 1.35rem);
-            font-weight: 300;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 2.5rem;
-            max-width: 560px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        /* ═══ FEATURES ═══ */
+        .features{padding:7rem 2rem;max-width:1200px;margin:0 auto}
+        .section-tag{display:inline-block;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--cyan);margin-bottom:.75rem}
+        .section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:800;margin-bottom:.75rem}
+        .section-desc{color:var(--text-2);font-size:1.05rem;line-height:1.6;max-width:520px;margin-bottom:3.5rem}
 
-        .hero-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-            margin-bottom: 3rem;
-        }
+        .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+        @media(max-width:900px){.feature-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:600px){.feature-grid{grid-template-columns:1fr}}
 
-        .hero-meta-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-        }
+        .f-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;transition:all .3s;position:relative;overflow:hidden}
+        .f-card:hover{border-color:var(--border-hover);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.25)}
+        .f-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent,var(--cyan));opacity:0;transition:opacity .3s}
+        .f-card:hover::before{opacity:1}
+        .f-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.25rem}
+        .f-icon.cyan{background:rgba(0,188,212,.1);--card-accent:var(--cyan)}
+        .f-icon.coral{background:rgba(255,107,107,.1);--card-accent:var(--coral)}
+        .f-icon.amber{background:rgba(245,158,11,.1);--card-accent:var(--amber)}
+        .f-icon.emerald{background:rgba(16,185,129,.1);--card-accent:var(--emerald)}
+        .f-icon.violet{background:rgba(139,92,246,.1);--card-accent:var(--violet)}
+        .f-icon.rose{background:rgba(244,63,94,.1);--card-accent:var(--rose)}
+        .f-card h3{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
+        .f-card p{color:var(--text-2);font-size:.9rem;line-height:1.6}
 
-        .hero-meta-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            background: linear-gradient(135deg, var(--cyan), var(--coral));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        /* ═══ ROUTE DEEP-DIVE ═══ */
+        .route{padding:7rem 2rem;max-width:1100px;margin:0 auto}
+        .route-header{text-align:center;margin-bottom:4rem}
+        .route-maltese{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-style:italic;color:var(--coral);margin-bottom:.5rem}
 
-        .hero-meta-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-        }
+        .route-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-bottom:4rem}
+        @media(max-width:700px){.route-stats-grid{grid-template-columns:repeat(2,1fr)}}
+        .r-stat{text-align:center;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:16px}
+        .r-stat-val{font-size:2.2rem;font-weight:900;color:var(--cyan);font-variant-numeric:tabular-nums}
+        .r-stat-lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-top:.25rem}
+        .r-stat-sub{font-size:.8rem;color:var(--text-2);margin-top:.15rem}
 
-        .cta-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+        /* Elevation profile (CSS-only approximation) */
+        .elev-container{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-bottom:3rem}
+        .elev-label{font-size:.8rem;font-weight:600;color:var(--text-2);margin-bottom:1rem}
+        .elev-chart{height:120px;display:flex;align-items:flex-end;gap:2px;padding:0 4px}
+        .elev-bar{flex:1;background:linear-gradient(to top,var(--cyan),rgba(0,188,212,.3));border-radius:3px 3px 0 0;transition:all .3s;min-width:3px}
+        .elev-bar:hover{background:linear-gradient(to top,var(--coral),rgba(255,107,107,.5))}
+        .elev-range{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.7rem;color:var(--text-3)}
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.875rem 2rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            cursor: pointer;
-            border: none;
-        }
+        /* POI list */
+        .poi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+        .poi{display:flex;align-items:center;gap:.75rem;padding:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+        .poi-emoji{font-size:1.5rem}
+        .poi-text{font-size:.85rem;font-weight:500}
+        .poi-sub{font-size:.75rem;color:var(--text-3)}
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--cyan), var(--cyan-dark));
-            color: white;
-            box-shadow: 0 4px 20px rgba(0, 188, 212, 0.3);
-        }
+        /* ═══ THEMES ═══ */
+        .themes{padding:7rem 2rem;max-width:1100px;margin:0 auto}
+        .theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+        @media(max-width:800px){.theme-grid{grid-template-columns:repeat(2,1fr)}}
+        .theme-card{border-radius:20px;padding:1.5rem;border:1px solid var(--border);transition:all .3s;cursor:default}
+        .theme-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+        .theme-swatch{width:100%;height:100px;border-radius:12px;margin-bottom:1rem;display:flex;align-items:center;justify-content:center}
+        .theme-swatch .dot{width:20px;height:20px;border-radius:50%;box-shadow:0 0 12px currentColor}
+        .theme-name{font-size:.95rem;font-weight:600;margin-bottom:.25rem}
+        .theme-desc{font-size:.8rem;color:var(--text-2)}
+        .t-dark-cyan{background:rgb(15,31,36)}
+        .t-dark-cyan .dot{background:#00BCD4;color:#00BCD4}
+        .t-dark-default{background:rgb(20,20,26)}
+        .t-dark-default .dot{background:#3B82F6;color:#3B82F6}
+        .t-light-coral{background:rgb(250,242,237)}
+        .t-light-coral .dot{background:#FF6B4A;color:#FF6B4A}
+        .t-spectator{background:rgb(13,20,18)}
+        .t-spectator .dot{background:#2DD4BF;color:#2DD4BF}
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 188, 212, 0.4);
-        }
+        /* ═══ SPECTATOR ═══ */
+        .spectator{padding:7rem 2rem;max-width:1000px;margin:0 auto}
+        .spec-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+        @media(max-width:800px){.spec-layout{grid-template-columns:1fr}}
+        .spec-features{list-style:none;display:flex;flex-direction:column;gap:1.25rem}
+        .spec-feat{display:flex;gap:1rem;align-items:flex-start}
+        .spec-feat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+        .spec-feat h4{font-size:.95rem;font-weight:600;margin-bottom:.2rem}
+        .spec-feat p{font-size:.85rem;color:var(--text-2);line-height:1.5}
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        /* Cheer mockup */
+        .cheer-demo{background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:2rem;text-align:center}
+        .cheer-runner{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;text-align:left}
+        .cheer-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--coral));display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+        .cheer-name{font-weight:600}
+        .cheer-pace{font-size:.85rem;color:var(--text-2)}
+        .cheer-progress{height:8px;background:rgba(255,255,255,.06);border-radius:4px;margin-bottom:1.5rem;overflow:hidden}
+        .cheer-progress-fill{height:100%;width:62%;background:linear-gradient(90deg,var(--cyan),var(--coral));border-radius:4px;transition:width 1s}
+        .cheer-btn{width:100%;padding:14px;border:none;border-radius:14px;background:var(--coral);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+        .cheer-btn:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(255,107,107,.3)}
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
+        /* ═══ LOVE LETTER ═══ */
+        .love{padding:7rem 2rem;text-align:center;max-width:680px;margin:0 auto}
+        .love h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);margin-bottom:2rem}
+        .love p{color:var(--text-2);font-size:1.05rem;line-height:1.85;margin-bottom:1.5rem}
+        .love .hl{color:var(--coral);font-weight:500}
+        .love .signature{font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;color:var(--cyan);margin-top:2rem}
 
-        /* Features */
-        .features {
-            padding: 6rem 2rem;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-header h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 4vw, 3rem);
-            margin-bottom: 1rem;
-        }
-
-        .section-header p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            max-width: 520px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: rgba(0, 188, 212, 0.2);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .feature-icon.cyan { background: rgba(0, 188, 212, 0.15); }
-        .feature-icon.coral { background: rgba(255, 107, 107, 0.15); }
-        .feature-icon.amber { background: rgba(245, 158, 11, 0.15); }
-        .feature-icon.emerald { background: rgba(16, 185, 129, 0.15); }
-        .feature-icon.violet { background: rgba(139, 92, 246, 0.15); }
-        .feature-icon.rose { background: rgba(244, 63, 94, 0.15); }
-
-        .feature-card h3 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.55;
-        }
-
-        /* Route section */
-        .route-section {
-            padding: 6rem 2rem;
-            text-align: center;
-        }
-
-        .route-stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            flex-wrap: wrap;
-            margin-top: 3rem;
-        }
-
-        .route-stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .route-stat-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-            color: var(--cyan);
-        }
-
-        .route-stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-top: 0.25rem;
-        }
-
-        .route-stat-sub {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.1rem;
-        }
-
-        /* Gozo love letter */
-        .gozo-section {
-            padding: 6rem 2rem;
-            max-width: 680px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .gozo-section h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 4vw, 2.75rem);
-            margin-bottom: 1.5rem;
-        }
-
-        .gozo-section p {
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-        }
-
-        .gozo-section .highlight {
-            color: var(--coral);
-            font-weight: 500;
-        }
-
-        /* Footer */
-        footer {
-            padding: 4rem 2rem 2rem;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        footer .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--cyan), var(--coral));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        footer p {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        footer .heart {
-            color: var(--coral);
-        }
-
-        /* Countdown section */
-        .countdown-section {
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .countdown-grid {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
-        .countdown-unit {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 1.5rem 2rem;
-            min-width: 100px;
-        }
-
-        .countdown-number {
-            font-size: 3rem;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-            background: linear-gradient(135deg, var(--cyan), var(--coral));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .countdown-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .hero-meta { gap: 1.5rem; }
-            .route-stats { gap: 2rem; }
-            .feature-grid { grid-template-columns: 1fr; }
-        }
+        /* ═══ FOOTER ═══ */
+        footer{padding:4rem 2rem 2rem;text-align:center;border-top:1px solid var(--border)}
+        .footer-logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+        footer p{color:var(--text-3);font-size:.85rem;line-height:1.8}
+        .heart{color:var(--coral)}
     </style>
 </head>
 <body>
+    <nav>
+        <div class="nav-logo">Run Fiona Run</div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#route">Route</a></li>
+            <li><a href="#themes">Themes</a></li>
+            <li><a href="#spectator">Spectator</a></li>
+        </ul>
+    </nav>
+
+    <!-- ═══ HERO ═══ -->
     <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span class="dot"></span>
-                Coming to iOS
-            </div>
-            <h1>Run <em>Fiona</em> Run</h1>
-            <p class="hero-subtitle">
-                Your personal companion for the Gozo Half Marathon. 
-                Live GPS tracking, voice KM alerts, and a spectator mode 
-                so your people can cheer you on — every step of the way.
-            </p>
-            <div class="hero-meta">
-                <div class="hero-meta-item">
-                    <span class="hero-meta-value">21.1</span>
-                    <span class="hero-meta-label">Kilometres</span>
+        <div class="hero-inner">
+            <div class="hero-text">
+                <div class="badge"><span class="pulse"></span> Coming to iOS</div>
+                <h1><span class="gradient">Run</span> <em>Fiona</em> <span class="gradient">Run</span></h1>
+                <p class="hero-sub">Your personal companion for the Gozo Half Marathon. Live GPS tracking, voice alerts at every kilometre, and a spectator mode so your people can cheer you on — every step of the way.</p>
+                <div class="hero-stats">
+                    <div><div class="hero-stat-val">21.1</div><div class="hero-stat-lbl">Kilometres</div></div>
+                    <div><div class="hero-stat-val">144m</div><div class="hero-stat-lbl">Peak Elevation</div></div>
+                    <div><div class="hero-stat-val" id="hero-days">--</div><div class="hero-stat-lbl">Days to Race</div></div>
                 </div>
-                <div class="hero-meta-item">
-                    <span class="hero-meta-value">664</span>
-                    <span class="hero-meta-label">Track Points</span>
-                </div>
-                <div class="hero-meta-item">
-                    <span class="hero-meta-value">144m</span>
-                    <span class="hero-meta-label">Peak Elevation</span>
-                </div>
-                <div class="hero-meta-item">
-                    <span class="hero-meta-value" id="countdown-days">--</span>
-                    <span class="hero-meta-label">Days to Race</span>
+                <div class="hero-cta">
+                    <a href="#features" class="btn btn-primary">✨ Explore Features</a>
+                    <a href="#route" class="btn btn-ghost">🗺️ See the Route</a>
                 </div>
             </div>
-            <div class="cta-group">
-                <a href="#features" class="btn btn-primary">
-                    ✨ See Features
-                </a>
-                <a href="#route" class="btn btn-secondary">
-                    🗺️ The Route
-                </a>
+            <div class="hero-visual">
+                <div class="float-badge top-left">📍 Live GPS</div>
+                <div class="float-badge top-right">🗣️ Voice Alerts</div>
+                <div class="float-badge bot-left">👀 Spectator Mode</div>
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="phone-screen-content">
+                            <div class="screen-map">
+                                <div class="route-line"></div>
+                                <div class="runner-dot"></div>
+                                <div class="km-dot" style="top:25%;left:20%"></div>
+                                <div class="km-dot" style="top:45%;left:75%"></div>
+                                <div class="km-dot" style="top:65%;left:30%"></div>
+                                <div class="km-dot" style="top:55%;left:60%"></div>
+                            </div>
+                            <div class="screen-hud">
+                                <div class="hud-title">Il-Ġirja t'Għawdex · 21.1 km</div>
+                                <div class="hud-stats">
+                                    <div class="hud-stat"><div class="hud-stat-val">13.2</div><div class="hud-stat-lbl">KM</div></div>
+                                    <div class="hud-stat"><div class="hud-stat-val">1:14:32</div><div class="hud-stat-lbl">TIME</div></div>
+                                    <div class="hud-stat"><div class="hud-stat-val">5'38"</div><div class="hud-stat-lbl">PACE</div></div>
+                                    <div class="hud-stat"><div class="hud-stat-val">+89m</div><div class="hud-stat-lbl">ELEV</div></div>
+                                </div>
+                                <div class="hud-buttons">
+                                    <div class="hud-btn hud-btn-start">▶ Running</div>
+                                    <div class="hud-btn hud-btn-spectate">👀 Spectate</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="features" id="features">
-        <div class="section-header">
-            <h2>Built for Gozo</h2>
-            <p>Everything you need on race day — and the weeks of training before it.</p>
-        </div>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <div class="feature-icon cyan">📍</div>
-                <h3>Live GPS Tracking</h3>
-                <p>Real-time position on the official race route. See exactly where you are on the 21.1km course through Gozo's stunning landscape.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon coral">🗣️</div>
-                <h3>Voice KM Alerts</h3>
-                <p>Audio announcements at every kilometre marker — pace, distance, elevation gained. No need to look at your phone.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon amber">👀</div>
-                <h3>Spectator Mode</h3>
-                <p>Your friends and family track you live on the map. They see your position, your pace, and can send you a cheer when you need it most.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon emerald">📊</div>
-                <h3>Elevation Profile</h3>
-                <p>Interactive chart showing the course elevation from sea level to 144m. Know what's coming — the hills of Gozo don't surprise you twice.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon violet">🎨</div>
-                <h3>Beautiful Themes</h3>
-                <p>Four hand-crafted colour themes. Dark cyan for night runs, coral for sunsets, light mode for bright days, spectator mode for the crowd.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon rose">⏱️</div>
-                <h3>Race Countdown</h3>
-                <p>Days, hours, minutes until the starting gun. Plus water station markers, first aid points, and marshal positions on the map.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="route-section" id="route">
-        <div class="section-header">
-            <h2>Il-Ġirja t'Għawdex</h2>
-            <p>The official Gozo Half Marathon route — 21.1 kilometres through one of the Mediterranean's most beautiful islands.</p>
-        </div>
-        <div class="route-stats">
-            <div class="route-stat">
-                <span class="route-stat-value">21.1</span>
-                <span class="route-stat-label">Kilometres</span>
-                <span class="route-stat-sub">Official half marathon</span>
-            </div>
-            <div class="route-stat">
-                <span class="route-stat-value">6m</span>
-                <span class="route-stat-label">Min Elevation</span>
-                <span class="route-stat-sub">Sea level start</span>
-            </div>
-            <div class="route-stat">
-                <span class="route-stat-value">144m</span>
-                <span class="route-stat-label">Max Elevation</span>
-                <span class="route-stat-sub">The big climb</span>
-            </div>
-            <div class="route-stat">
-                <span class="route-stat-value">20</span>
-                <span class="route-stat-label">KM Markers</span>
-                <span class="route-stat-sub">Voice alerts at each</span>
-            </div>
-        </div>
-    </section>
-
-    <section class="gozo-section">
-        <h2>Made with love in Gozo</h2>
-        <p>
-            This app was born in <span class="highlight">Xagħra</span>, in a 400-year-old townhouse, 
-            built by someone who thinks the best way to show love 
-            is to make sure you never run alone.
-        </p>
-        <p>
-            <strong>Sunday, April 26th, 2026 · 7:30 AM · Xagħra Square</strong><br>
-            The Gozo Half Marathon winds through ancient villages, 
-            past the Marsalforn salt pans, along limestone cliffs, past Ta' Pinu Shrine 
-            and through Victoria — up hills that earn every view. 
-            This app knows every turn, every climb, every water station.
-        </p>
-        <p>
-            <span class="highlight">Run, Fiona. We'll be watching.</span> 🦞
-        </p>
-    </section>
-
-    <section class="countdown-section">
-        <div class="section-header">
-            <h2>Race Day Countdown</h2>
-        </div>
+    <!-- ═══ COUNTDOWN BAR ═══ -->
+    <section class="countdown-bar">
+        <div class="countdown-label">Race Day Countdown</div>
         <div class="countdown-grid">
-            <div class="countdown-unit">
-                <div class="countdown-number" id="cd-days">--</div>
-                <div class="countdown-label">Days</div>
+            <div class="cd-unit"><div class="cd-num" id="cd-d">--</div><div class="cd-lbl">Days</div></div>
+            <div class="cd-unit"><div class="cd-num" id="cd-h">--</div><div class="cd-lbl">Hours</div></div>
+            <div class="cd-unit"><div class="cd-num" id="cd-m">--</div><div class="cd-lbl">Minutes</div></div>
+            <div class="cd-unit"><div class="cd-num" id="cd-s">--</div><div class="cd-lbl">Seconds</div></div>
+        </div>
+        <div class="cd-race-info"><strong>Sunday, April 26th, 2026</strong> · 7:30 AM · Xagħra Square, Gozo</div>
+    </section>
+
+    <!-- ═══ FEATURES ═══ -->
+    <section class="features" id="features">
+        <div class="section-tag">Features</div>
+        <div class="section-title">Everything you need on race day</div>
+        <div class="section-desc">And the weeks of training before it. Built for Gozo's terrain, tested on the actual course.</div>
+        <div class="feature-grid">
+            <div class="f-card" style="--card-accent:var(--cyan)"><div class="f-icon cyan">📍</div><h3>Live GPS Tracking</h3><p>Your real-time position on the official 21.1km race route. Satellite map with your exact location through every village and coastal stretch.</p></div>
+            <div class="f-card" style="--card-accent:var(--coral)"><div class="f-icon coral">🗣️</div><h3>Voice KM Alerts</h3><p>Spoken updates at every kilometre — pace, distance, elevation gained. Keep your phone in your pocket. We'll tell you everything you need to hear.</p></div>
+            <div class="f-card" style="--card-accent:var(--amber)"><div class="f-icon amber">👀</div><h3>Spectator Mode</h3><p>Friends and family track you live. They see your dot on the map, your pace, your progress ring — and they can send you a cheer when the hills hit.</p></div>
+            <div class="f-card" style="--card-accent:var(--emerald)"><div class="f-icon emerald">📊</div><h3>Elevation Profile</h3><p>Interactive chart showing every climb from sea level to 144m. Know what's ahead. The hills of Gozo don't surprise you twice.</p></div>
+            <div class="f-card" style="--card-accent:var(--violet)"><div class="f-icon violet">🎨</div><h3>4 Beautiful Themes</h3><p>Dark Cyan for dawn, Light Coral for golden hour, Spectator Dark for the crowd. Switch live — no restart, instant vibes.</p></div>
+            <div class="f-card" style="--card-accent:var(--rose)"><div class="f-icon rose">🗺️</div><h3>Full POI Layer</h3><p>Water stations, first aid, marshals, parking, music stages, toilets, and every turn direction — all on the map before you lace up.</p></div>
+        </div>
+    </section>
+
+    <!-- ═══ ROUTE ═══ -->
+    <section class="route" id="route">
+        <div class="route-header">
+            <div class="section-tag">The Route</div>
+            <div class="route-maltese">Il-Ġirja t'Għawdex</div>
+            <div class="section-title">21.1 km through paradise</div>
+            <div class="section-desc" style="margin:0 auto">From Xagħra Square past the Marsalforn salt pans, along the northern coast, through Victoria, past Ta' Pinu Shrine — and back home.</div>
+        </div>
+
+        <div class="route-stats-grid">
+            <div class="r-stat"><div class="r-stat-val">21.1</div><div class="r-stat-lbl">Kilometres</div><div class="r-stat-sub">Official half marathon</div></div>
+            <div class="r-stat"><div class="r-stat-val">6m</div><div class="r-stat-lbl">Min Elevation</div><div class="r-stat-sub">Sea level start</div></div>
+            <div class="r-stat"><div class="r-stat-val">144m</div><div class="r-stat-lbl">Max Elevation</div><div class="r-stat-sub">The big climb</div></div>
+            <div class="r-stat"><div class="r-stat-val">664</div><div class="r-stat-lbl">Track Points</div><div class="r-stat-sub">GPS precision</div></div>
+        </div>
+
+        <div class="elev-container">
+            <div class="elev-label">Elevation Profile</div>
+            <div class="elev-chart" id="elev-chart"></div>
+            <div class="elev-range"><span>0 km</span><span>5 km</span><span>10 km</span><span>15 km</span><span>21.1 km</span></div>
+        </div>
+
+        <div class="poi-grid">
+            <div class="poi"><div class="poi-emoji">💧</div><div><div class="poi-text">Water Stations</div><div class="poi-sub">Every ~3 km</div></div></div>
+            <div class="poi"><div class="poi-emoji">🏥</div><div><div class="poi-text">First Aid</div><div class="poi-sub">4 medical points</div></div></div>
+            <div class="poi"><div class="poi-emoji">🚻</div><div><div class="poi-text">Toilets</div><div class="poi-sub">Start + route</div></div></div>
+            <div class="poi"><div class="poi-emoji">🎵</div><div><div class="poi-text">Music Stages</div><div class="poi-sub">Live entertainment</div></div></div>
+            <div class="poi"><div class="poi-emoji">🅿️</div><div><div class="poi-text">Free Parking</div><div class="poi-sub">Mġarr + Xagħra</div></div></div>
+            <div class="poi"><div class="poi-emoji">🚌</div><div><div class="poi-text">Free Transport</div><div class="poi-sub">Mġarr → Xagħra</div></div></div>
+        </div>
+    </section>
+
+    <!-- ═══ THEMES ═══ -->
+    <section class="themes" id="themes">
+        <div class="section-tag">Personalise</div>
+        <div class="section-title">4 hand-crafted themes</div>
+        <div class="section-desc">Switch instantly, mid-run if you want. Each one designed for a different moment.</div>
+        <div class="theme-grid">
+            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-dark-cyan"><div class="dot"></div></div><div class="theme-name">Dark Cyan</div><div class="theme-desc">Dawn runs. Cool and focused.</div></div>
+            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-dark-default"><div class="dot"></div></div><div class="theme-name">Dark Default</div><div class="theme-desc">Clean and classic. Night mode.</div></div>
+            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-light-coral"><div class="dot"></div></div><div class="theme-name">Light Coral</div><div class="theme-desc">Golden hour. Warm and alive.</div></div>
+            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-spectator"><div class="dot"></div></div><div class="theme-name">Spectator Dark</div><div class="theme-desc">For the crowd. Mint and electric.</div></div>
+        </div>
+    </section>
+
+    <!-- ═══ SPECTATOR ═══ -->
+    <section class="spectator" id="spectator">
+        <div class="spec-layout">
+            <div>
+                <div class="section-tag">For the people who love you</div>
+                <div class="section-title">Spectator Mode</div>
+                <div class="section-desc">They can't be at every kilometre. But they can be with you on every kilometre.</div>
+                <ul class="spec-features">
+                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(0,188,212,.1)">📍</div><div><h4>Live Runner Tracking</h4><p>See the runner's exact position on the course map in real time.</p></div></li>
+                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(255,107,107,.1)">👏</div><div><h4>Send a Cheer</h4><p>One tap. The runner feels a haptic buzz and sees your encouragement. When km 18 hits and the legs are screaming — that cheer matters.</p></div></li>
+                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(245,158,11,.1)">📊</div><div><h4>Progress Ring</h4><p>Visual percentage of the race completed. Watch it fill up. Hold your breath at 90%.</p></div></li>
+                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(16,185,129,.1)">⏱️</div><div><h4>Pace & Distance</h4><p>Real-time pace, total distance, and elevation — everything the runner sees, the spectator sees too.</p></div></li>
+                </ul>
             </div>
-            <div class="countdown-unit">
-                <div class="countdown-number" id="cd-hours">--</div>
-                <div class="countdown-label">Hours</div>
-            </div>
-            <div class="countdown-unit">
-                <div class="countdown-number" id="cd-mins">--</div>
-                <div class="countdown-label">Minutes</div>
-            </div>
-            <div class="countdown-unit">
-                <div class="countdown-number" id="cd-secs">--</div>
-                <div class="countdown-label">Seconds</div>
+            <div class="cheer-demo">
+                <div class="cheer-runner">
+                    <div class="cheer-avatar">🏃‍♀️</div>
+                    <div><div class="cheer-name">Fiona</div><div class="cheer-pace">13.1 km · 5'42" pace · +89m elev</div></div>
+                </div>
+                <div class="cheer-progress"><div class="cheer-progress-fill"></div></div>
+                <button class="cheer-btn" onclick="this.textContent='🎉 Cheer sent!';this.style.background='#10B981';setTimeout(()=>{this.textContent='👏 Send a Cheer!';this.style.background='var(--coral)'},3000)">👏 Send a Cheer!</button>
             </div>
         </div>
+    </section>
+
+    <!-- ═══ LOVE LETTER ═══ -->
+    <section class="love">
+        <h2>Made with love in Gozo</h2>
+        <p>This app was born in <span class="hl">Xagħra</span>, in a 400-year-old townhouse, built by someone who thinks the best way to show love is to make sure you never run alone.</p>
+        <p>The Gozo Half Marathon winds through ancient villages, past the Marsalforn salt pans, along limestone cliffs, up hills that earn every view. Past Ta' Pinu Shrine, through Victoria's narrow streets, and back to Xagħra Square — where it all started.</p>
+        <p>This app knows every turn, every climb, every water station. It was made for one runner in particular — but it'll be there for every runner who needs it.</p>
+        <p><span class="hl">Run, Fiona. We'll be watching.</span></p>
+        <div class="signature">— with love, from the house on Triq il-Knisja 🦞</div>
     </section>
 
     <footer>
-        <div class="logo">Run Fiona Run</div>
-        <p>A Gozo Half Marathon companion app</p>
-        <p style="margin-top: 0.75rem;">Made with <span class="heart">♥</span> in Xagħra, Gozo</p>
-        <p style="margin-top: 1.5rem; font-size: 0.75rem;">© 2026 Run Fiona Run. All rights reserved.</p>
+        <div class="footer-logo">Run Fiona Run</div>
+        <p>Gozo Half Marathon · April 26, 2026 · Xagħra Square</p>
+        <p>Made with <span class="heart">♥</span> in Xagħra, Gozo</p>
+        <p style="margin-top:1rem;font-size:.75rem">© 2026 Run Fiona Run</p>
     </footer>
 
     <script>
-        // Gozo Half Marathon 2026 — Sunday 26 April, 7:30 AM Malta time
-        // Starts and finishes at Xagħra Square
-        const raceDate = new Date('2026-04-26T07:30:00+02:00');
-
-        function updateCountdown() {
-            const now = new Date();
-            const diff = raceDate - now;
-
-            if (diff <= 0) {
-                document.getElementById('countdown-days').textContent = '0';
-                document.getElementById('cd-days').textContent = '0';
-                document.getElementById('cd-hours').textContent = '0';
-                document.getElementById('cd-mins').textContent = '0';
-                document.getElementById('cd-secs').textContent = '0';
-                return;
-            }
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById('countdown-days').textContent = days;
-            document.getElementById('cd-days').textContent = days;
-            document.getElementById('cd-hours').textContent = hours;
-            document.getElementById('cd-mins').textContent = mins;
-            document.getElementById('cd-secs').textContent = secs;
+        const race = new Date('2026-04-26T07:30:00+02:00');
+        function tick(){
+            const d=race-new Date();
+            if(d<=0)return;
+            const D=Math.floor(d/864e5),H=Math.floor(d%864e5/36e5),M=Math.floor(d%36e5/6e4),S=Math.floor(d%6e4/1e3);
+            document.getElementById('hero-days').textContent=D;
+            document.getElementById('cd-d').textContent=D;
+            document.getElementById('cd-h').textContent=H;
+            document.getElementById('cd-m').textContent=M;
+            document.getElementById('cd-s').textContent=S;
         }
+        tick();setInterval(tick,1000);
 
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
+        // Elevation profile (approximation of real GPX data)
+        const elevData=[6,8,12,18,28,42,55,68,80,95,108,118,128,135,140,144,138,125,112,98,85,72,62,55,48,42,38,35,32,30,28,25,22,20,18,16,15,14,12,10,8,6];
+        const chart=document.getElementById('elev-chart');
+        const max=Math.max(...elevData);
+        elevData.forEach(v=>{
+            const bar=document.createElement('div');
+            bar.className='elev-bar';
+            bar.style.height=Math.max(4,v/max*100)+'%';
+            bar.title=v+'m';
+            chart.appendChild(bar);
+        });
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
+        // Intersection observer for animations
+        const observer=new IntersectionObserver(entries=>{
+            entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}});
+        },{threshold:0.1});
+        document.querySelectorAll('.f-card,.r-stat,.theme-card,.poi,.spec-feat').forEach(el=>{
+            el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition='all 0.5s ease';
+            observer.observe(el);
         });
     </script>
 </body>
