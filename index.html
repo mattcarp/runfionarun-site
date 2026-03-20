@@ -1,439 +1,658 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Run Fiona Run — Gozo Half Marathon</title>
-    <meta name="description" content="Your personal companion for the Gozo Half Marathon. Live GPS, voice alerts, spectator mode. April 26, 2026 — Xagħra Square.">
-    <meta property="og:title" content="Run Fiona Run">
-    <meta property="og:description" content="Gozo Half Marathon companion app — live GPS, voice alerts, spectator mode.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://runfionarun.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --cyan: #00BCD4;
-            --cyan-glow: rgba(0, 188, 212, 0.15);
-            --coral: #FF6B6B;
-            --coral-glow: rgba(255, 107, 107, 0.12);
-            --amber: #F59E0B;
-            --emerald: #10B981;
-            --violet: #8B5CF6;
-            --rose: #F43E5E;
-            --bg: #060A13;
-            --bg-card: #0D1321;
-            --bg-card-hover: #111B2E;
-            --border: rgba(255,255,255,0.06);
-            --border-hover: rgba(0,188,212,0.25);
-            --text: #F1F5F9;
-            --text-2: #B0BEC5;
-            --text-3: #7E99A8;
-        }
-        *{margin:0;padding:0;box-sizing:border-box}
-        html{scroll-behavior:smooth}
-        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:16px;line-height:1.6}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Run Fiona Run — Gozo Half Marathon Companion App</title>
+  <meta name="description" content="The iOS companion app for the Gozo Half Marathon. Live GPS tracking, spectator mode, voice alerts, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FFFAF5',
+            terracotta: '#C75B39',
+            'terracotta-dark': '#A94B2E',
+            sea: '#2D7D9A',
+            'sea-dark': '#246579',
+            stone: '#3D3D3D',
+            'stone-light': '#6B6B6B',
+            sand: '#F5EDE4',
+            'sand-dark': '#E8DDD0',
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Smooth reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
 
-        :focus-visible{outline:3px solid rgba(0,188,212,.35);outline-offset:2px;border-radius:4px}
-        /* ═══ NAV ═══ */
-        nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(6,10,19,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-        .nav-logo{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .nav-links{display:flex;gap:2rem;list-style:none}
-        .nav-links a{color:var(--text-2);text-decoration:none;font-size:.85rem;font-weight:500;letter-spacing:.02em;transition:color .2s}
-        .nav-links a:hover{color:var(--cyan)}
-        @media(max-width:640px){.nav-links{display:none}}
+    /* Countdown pulse */
+    @keyframes tick {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+    .tick-anim {
+      animation: tick 1s ease-in-out;
+    }
 
-        /* ═══ HERO ═══ */
-        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
-        .hero::before{content:'';position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,var(--cyan-glow),transparent 70%);top:-200px;right:-200px;animation:float 15s ease-in-out infinite alternate}
-        .hero::after{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,var(--coral-glow),transparent 70%);bottom:-100px;left:-150px;animation:float 18s ease-in-out infinite alternate-reverse}
-        @keyframes float{0%{transform:translate(0,0)}100%{transform:translate(30px,-20px)}}
+    /* Cheer burst */
+    @keyframes cheer-burst {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .cheer-burst {
+      animation: cheer-burst 0.5s ease-out;
+    }
 
-        .hero-inner{position:relative;z-index:1;max-width:1200px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-        @media(max-width:900px){.hero-inner{grid-template-columns:1fr;text-align:center}}
+    /* Elevation bars */
+    .elev-bar {
+      transition: height 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-        .hero-text .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem 1rem;border:1px solid rgba(0,188,212,.2);border-radius:100px;font-size:.75rem;font-weight:600;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;background:rgba(0,188,212,.06)}
-        .badge .pulse{width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:pulse 2s ease-in-out infinite}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    /* Focus ring */
+    *:focus-visible {
+      outline: 3px solid #2D7D9A;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
 
-        .hero-text h1{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,7vw,6rem);font-weight:800;line-height:1;margin-bottom:1.5rem}
-        .hero-text h1 .gradient{background:linear-gradient(135deg,var(--text) 20%,var(--cyan) 60%,var(--coral) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .hero-text h1 em{font-family:'Playfair Display',serif;font-style:italic;background:linear-gradient(135deg,var(--coral),#FF8A80);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .hero-sub{font-size:1.15rem;font-weight:300;color:var(--text-2);line-height:1.7;margin-bottom:2rem;max-width:480px}
-        @media(max-width:900px){.hero-sub{margin:0 auto 2rem}}
+    /* Nav blur */
+    .nav-blur {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
 
-        .hero-stats{display:flex;gap:2.5rem;margin-bottom:2.5rem;flex-wrap:wrap}
-        @media(max-width:900px){.hero-stats{justify-content:center}}
-        .hero-stat-val{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .hero-stat-lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2)}
-
-        .hero-cta{display:flex;gap:1rem;flex-wrap:wrap}
-        @media(max-width:900px){.hero-cta{justify-content:center}}
-        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.95rem 2.25rem;border-radius:14px;font-size:1rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:all .25s;min-height:48px}
-        .btn-primary{background:linear-gradient(135deg,var(--cyan),#0097A7);color:#fff;box-shadow:0 4px 24px rgba(0,188,212,.25)}
-        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,188,212,.35)}
-        .btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12)}
-        .btn-ghost:hover{background:rgba(255,255,255,.08);transform:translateY(-2px)}
-
-        /* Phone mockup */
-        .hero-visual{display:flex;justify-content:center;position:relative}
-        .phone-frame{width:280px;height:580px;border-radius:40px;border:3px solid rgba(255,255,255,.1);background:var(--bg-card);position:relative;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.1)}
-        .phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:28px;background:var(--bg);border-radius:0 0 16px 16px;z-index:2}
-        .phone-screen{position:absolute;inset:3px;border-radius:37px;overflow:hidden}
-        .phone-screen-content{width:100%;height:100%;background:linear-gradient(180deg,#0A1628 0%,#0D1F3C 30%,#0A1628 100%);display:flex;flex-direction:column;padding-top:36px}
-        .screen-map{flex:1;background:linear-gradient(135deg,#1a2744 0%,#0d1f3c 50%,#162238 100%);position:relative;overflow:hidden}
-        .screen-map .route-line{position:absolute;top:15%;left:10%;width:80%;height:60%;border:2px solid var(--cyan);border-radius:40% 60% 50% 40%;opacity:.6;transform:rotate(-15deg)}
-        .screen-map .runner-dot{position:absolute;top:35%;left:55%;width:14px;height:14px;background:var(--coral);border-radius:50%;box-shadow:0 0 12px var(--coral);animation:runner-pulse 2s ease-in-out infinite}
-        @keyframes runner-pulse{0%,100%{transform:scale(1);box-shadow:0 0 12px var(--coral)}50%{transform:scale(1.3);box-shadow:0 0 20px var(--coral)}}
-        .screen-map .km-dot{position:absolute;width:8px;height:8px;background:rgba(255,255,255,.3);border-radius:50%}
-
-        .screen-hud{background:rgba(13,19,33,.95);backdrop-filter:blur(10px);padding:12px 16px;border-top:1px solid var(--border)}
-        .hud-title{font-size:.65rem;font-weight:600;color:var(--text-2);margin-bottom:6px}
-        .hud-stats{display:flex;justify-content:space-between}
-        .hud-stat{text-align:center}
-        .hud-stat-val{font-size:.9rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)}
-        .hud-stat-lbl{font-size:.55rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em}
-        .hud-buttons{display:flex;gap:8px;margin-top:10px}
-        .hud-btn{flex:1;padding:8px;border-radius:10px;text-align:center;font-size:.7rem;font-weight:600;color:#fff}
-        .hud-btn-start{background:var(--cyan)}
-        .hud-btn-spectate{background:rgba(255,255,255,.08);border:1px solid var(--border)}
-
-        /* Floating elements around phone */
-        .float-badge{position:absolute;padding:.5rem 1rem;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);font-size:.75rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:3}
-        .float-badge.top-left{top:40px;left:-60px;animation:bob 4s ease-in-out infinite}
-        .float-badge.top-right{top:100px;right:-50px;animation:bob 5s ease-in-out infinite .5s}
-        .float-badge.bot-left{bottom:120px;left:-40px;animation:bob 4.5s ease-in-out infinite 1s}
-        @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-        @media(max-width:900px){.float-badge{display:none}}
-
-        /* ═══ COUNTDOWN ═══ */
-        .countdown-bar{background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:2.5rem 2rem;text-align:center}
-        .countdown-label{font-size:.8rem;text-transform:uppercase;letter-spacing:.15em;color:var(--text-3);margin-bottom:1rem}
-        .countdown-grid{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
-        .cd-unit{min-width:80px;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:14px}
-        .cd-num{font-size:2.5rem;font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .cd-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-2);margin-top:.2rem}
-        .cd-race-info{margin-top:1rem;font-size:.9rem;color:var(--text-2)}
-        .cd-race-info strong{color:var(--text)}
-
-        /* ═══ FEATURES ═══ */
-        .features{padding:7rem 2rem;max-width:1200px;margin:0 auto}
-        .section-tag{display:inline-block;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--cyan);margin-bottom:.75rem}
-        .section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:800;margin-bottom:.75rem}
-        .section-desc{color:var(--text-2);font-size:1.05rem;line-height:1.6;max-width:520px;margin-bottom:3.5rem}
-
-        .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-        @media(max-width:900px){.feature-grid{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:600px){.feature-grid{grid-template-columns:1fr}}
-
-        .f-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;transition:all .3s;position:relative;overflow:hidden}
-        .f-card:hover{border-color:var(--border-hover);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.25)}
-        .f-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent,var(--cyan));opacity:0;transition:opacity .3s}
-        .f-card:hover::before{opacity:1}
-        .f-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.25rem}
-        .f-icon.cyan{background:rgba(0,188,212,.1);--card-accent:var(--cyan)}
-        .f-icon.coral{background:rgba(255,107,107,.1);--card-accent:var(--coral)}
-        .f-icon.amber{background:rgba(245,158,11,.1);--card-accent:var(--amber)}
-        .f-icon.emerald{background:rgba(16,185,129,.1);--card-accent:var(--emerald)}
-        .f-icon.violet{background:rgba(139,92,246,.1);--card-accent:var(--violet)}
-        .f-icon.rose{background:rgba(244,63,94,.1);--card-accent:var(--rose)}
-        .f-card h3{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
-        .f-card p{color:var(--text-2);font-size:.92rem;line-height:1.65}
-
-        /* ═══ ROUTE DEEP-DIVE ═══ */
-        .route{padding:7rem 2rem;max-width:1100px;margin:0 auto}
-        .route-header{text-align:center;margin-bottom:4rem}
-        .route-maltese{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-style:italic;color:var(--coral);margin-bottom:.5rem}
-
-        .route-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-bottom:4rem}
-        @media(max-width:700px){.route-stats-grid{grid-template-columns:repeat(2,1fr)}}
-        .r-stat{text-align:center;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:16px}
-        .r-stat-val{font-size:2.2rem;font-weight:900;color:var(--cyan);font-variant-numeric:tabular-nums}
-        .r-stat-lbl{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2);margin-top:.25rem}
-        .r-stat-sub{font-size:.8rem;color:var(--text-2);margin-top:.15rem}
-
-        /* Elevation profile (CSS-only approximation) */
-        .elev-container{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-bottom:3rem}
-        .elev-label{font-size:.8rem;font-weight:600;color:var(--text-2);margin-bottom:1rem}
-        .elev-chart{height:120px;display:flex;align-items:flex-end;gap:2px;padding:0 4px}
-        .elev-bar{flex:1;background:linear-gradient(to top,var(--cyan),rgba(0,188,212,.3));border-radius:3px 3px 0 0;transition:all .3s;min-width:3px}
-        .elev-bar:hover{background:linear-gradient(to top,var(--coral),rgba(255,107,107,.5))}
-        .elev-range{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.7rem;color:var(--text-3)}
-
-        /* POI list */
-        .poi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
-        .poi{display:flex;align-items:center;gap:.75rem;padding:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
-        .poi-emoji{font-size:1.5rem}
-        .poi-text{font-size:.85rem;font-weight:500}
-        .poi-sub{font-size:.78rem;color:var(--text-2)}
-
-        /* ═══ THEMES ═══ */
-        .themes{padding:7rem 2rem;max-width:1100px;margin:0 auto}
-        .theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
-        @media(max-width:800px){.theme-grid{grid-template-columns:repeat(2,1fr)}}
-        .theme-card{border-radius:20px;padding:1.5rem;border:1px solid var(--border);transition:all .3s;cursor:default}
-        .theme-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
-        .theme-swatch{width:100%;height:100px;border-radius:12px;margin-bottom:1rem;display:flex;align-items:center;justify-content:center}
-        .theme-swatch .dot{width:20px;height:20px;border-radius:50%;box-shadow:0 0 12px currentColor}
-        .theme-name{font-size:.95rem;font-weight:600;margin-bottom:.25rem}
-        .theme-desc{font-size:.82rem;color:var(--text-2);line-height:1.5}
-        .t-dark-cyan{background:rgb(15,31,36)}
-        .t-dark-cyan .dot{background:#00BCD4;color:#00BCD4}
-        .t-dark-default{background:rgb(20,20,26)}
-        .t-dark-default .dot{background:#3B82F6;color:#3B82F6}
-        .t-light-coral{background:rgb(250,242,237)}
-        .t-light-coral .dot{background:#FF6B4A;color:#FF6B4A}
-        .t-spectator{background:rgb(13,20,18)}
-        .t-spectator .dot{background:#2DD4BF;color:#2DD4BF}
-
-        /* ═══ SPECTATOR ═══ */
-        .spectator{padding:7rem 2rem;max-width:1000px;margin:0 auto}
-        .spec-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-        @media(max-width:800px){.spec-layout{grid-template-columns:1fr}}
-        .spec-features{list-style:none;display:flex;flex-direction:column;gap:1.25rem}
-        .spec-feat{display:flex;gap:1rem;align-items:flex-start}
-        .spec-feat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-        .spec-feat h4{font-size:.95rem;font-weight:600;margin-bottom:.2rem}
-        .spec-feat p{font-size:.85rem;color:var(--text-2);line-height:1.5}
-
-        /* Cheer mockup */
-        .cheer-demo{background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:2rem;text-align:center}
-        .cheer-runner{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;text-align:left}
-        .cheer-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--coral));display:flex;align-items:center;justify-content:center;font-size:1.4rem}
-        .cheer-name{font-weight:600}
-        .cheer-pace{font-size:.85rem;color:var(--text-2)}
-        .cheer-progress{height:8px;background:rgba(255,255,255,.06);border-radius:4px;margin-bottom:1.5rem;overflow:hidden}
-        .cheer-progress-fill{height:100%;width:62%;background:linear-gradient(90deg,var(--cyan),var(--coral));border-radius:4px;transition:width 1s}
-        .cheer-btn{width:100%;padding:14px;border:none;border-radius:14px;background:var(--coral);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
-        .cheer-btn:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(255,107,107,.3)}
-
-        /* ═══ LOVE LETTER ═══ */
-        .love{padding:7rem 2rem;text-align:center;max-width:680px;margin:0 auto}
-        .love h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);margin-bottom:2rem}
-        .love p{color:var(--text-2);font-size:1.05rem;line-height:1.85;margin-bottom:1.5rem}
-        .love .hl{color:var(--coral);font-weight:500}
-        .love .signature{font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;color:var(--cyan);margin-top:2rem}
-
-        /* ═══ FOOTER ═══ */
-        footer{padding:4rem 2rem 2rem;text-align:center;border-top:1px solid var(--border)}
-        .footer-logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
-        footer p{color:var(--text-3);font-size:.85rem;line-height:1.8}
-        .heart{color:var(--coral)}
-    </style>
+    /* Gradient text helper */
+    .text-gradient {
+      background: linear-gradient(135deg, #C75B39 0%, #2D7D9A 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
 </head>
-<body>
-    <nav>
-        <div class="nav-logo">Run Fiona Run</div>
-        <ul class="nav-links">
-            <li><a href="#features">Features</a></li>
-            <li><a href="#route">Route</a></li>
-            <li><a href="#themes">Themes</a></li>
-            <li><a href="#spectator">Spectator</a></li>
-        </ul>
-    </nav>
 
-    <!-- ═══ HERO ═══ -->
-    <section class="hero">
-        <div class="hero-inner">
-            <div class="hero-text">
-                <div class="badge"><span class="pulse"></span> Coming to iOS</div>
-                <h1><span class="gradient">Run</span> <em>Fiona</em> <span class="gradient">Run</span></h1>
-                <p class="hero-sub">Your personal companion for the Gozo Half Marathon. Live GPS tracking, voice alerts at every kilometre, and a spectator mode so your people can cheer you on — every step of the way.</p>
-                <div class="hero-stats">
-                    <div><div class="hero-stat-val">21.1</div><div class="hero-stat-lbl">Kilometres</div></div>
-                    <div><div class="hero-stat-val">144m</div><div class="hero-stat-lbl">Peak Elevation</div></div>
-                    <div><div class="hero-stat-val" id="hero-days">--</div><div class="hero-stat-lbl">Days to Race</div></div>
-                </div>
-                <div class="hero-cta">
-                    <a href="#features" class="btn btn-primary">✨ Explore Features</a>
-                    <a href="#route" class="btn btn-ghost">🗺️ See the Route</a>
-                </div>
+<body class="bg-cream text-stone font-sans antialiased">
+
+  <!-- ============================================================ -->
+  <!-- NAV -->
+  <!-- ============================================================ -->
+  <nav id="nav" class="fixed top-0 left-0 right-0 z-50 nav-blur bg-cream/80 border-b border-sand-dark/50 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#hero" class="font-serif text-xl font-bold tracking-tight">
+        Run <span class="italic text-terracotta">Fiona</span> Run
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-light">
+        <a href="#features" class="hover:text-terracotta transition-colors">Features</a>
+        <a href="#route" class="hover:text-terracotta transition-colors">Route</a>
+        <a href="#spectator" class="hover:text-terracotta transition-colors">Spectator</a>
+        <a href="#themes" class="hover:text-terracotta transition-colors">Themes</a>
+        <a href="#love" class="hover:text-terracotta transition-colors">About</a>
+      </div>
+      <a href="#hero" class="inline-flex items-center gap-2 bg-terracotta text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-terracotta-dark transition-colors focus-visible:ring-2 focus-visible:ring-terracotta">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download
+      </a>
+    </div>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- HERO -->
+  <!-- ============================================================ -->
+  <section id="hero" class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+    <!-- Decorative background circles -->
+    <div class="absolute top-20 -right-32 w-96 h-96 bg-terracotta/5 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-20 -left-32 w-96 h-96 bg-sea/5 rounded-full blur-3xl"></div>
+
+    <div class="max-w-5xl mx-auto px-6 text-center py-24 md:py-32">
+      <p class="reveal text-sm md:text-base font-semibold tracking-[0.2em] uppercase text-sea mb-8">
+        Gozo Half Marathon · iOS Companion App
+      </p>
+
+      <h1 class="reveal reveal-delay-1 font-serif text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.9] tracking-tight mb-8">
+        Run <span class="italic text-terracotta">Fiona</span> Run
+      </h1>
+
+      <p class="reveal reveal-delay-2 max-w-2xl mx-auto text-lg md:text-xl text-stone-light leading-relaxed mb-6">
+        Live GPS tracking, voice-guided pacing, spectator cheering, and a love letter to the most beautiful course in the Mediterranean.
+      </p>
+
+      <p class="reveal reveal-delay-3 inline-flex items-center gap-2 text-base font-medium text-terracotta mb-12">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Sunday, April 26th · 7:30 AM · Xagħra Square
+      </p>
+
+      <div class="reveal reveal-delay-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#countdown" class="inline-flex items-center gap-2 bg-terracotta text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-terracotta-dark transition-all hover:shadow-lg hover:shadow-terracotta/20 focus-visible:ring-2 focus-visible:ring-terracotta">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Download for iOS
+        </a>
+        <a href="#features" class="inline-flex items-center gap-2 border-2 border-stone/20 text-stone font-semibold px-8 py-4 rounded-full text-lg hover:border-sea hover:text-sea transition-all focus-visible:ring-2 focus-visible:ring-sea">
+          Explore Features
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- COUNTDOWN -->
+  <!-- ============================================================ -->
+  <section id="countdown" class="py-24 md:py-32 bg-sand/50">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <p class="reveal text-sm font-semibold tracking-[0.2em] uppercase text-sea mb-4">Race Day</p>
+      <h2 class="reveal reveal-delay-1 font-serif text-4xl md:text-5xl font-bold mb-16">The Countdown Is On</h2>
+
+      <div class="reveal reveal-delay-2 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-3xl mx-auto">
+        <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+          <span id="cd-days" class="block font-serif text-5xl md:text-6xl font-bold text-terracotta">--</span>
+          <span class="text-sm font-medium text-stone-light uppercase tracking-wider mt-2 block">Days</span>
+        </div>
+        <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+          <span id="cd-hours" class="block font-serif text-5xl md:text-6xl font-bold text-terracotta">--</span>
+          <span class="text-sm font-medium text-stone-light uppercase tracking-wider mt-2 block">Hours</span>
+        </div>
+        <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+          <span id="cd-mins" class="block font-serif text-5xl md:text-6xl font-bold text-terracotta">--</span>
+          <span class="text-sm font-medium text-stone-light uppercase tracking-wider mt-2 block">Minutes</span>
+        </div>
+        <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+          <span id="cd-secs" class="block font-serif text-5xl md:text-6xl font-bold text-terracotta">--</span>
+          <span class="text-sm font-medium text-stone-light uppercase tracking-wider mt-2 block">Seconds</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- FEATURES -->
+  <!-- ============================================================ -->
+  <section id="features" class="py-24 md:py-32">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16 md:mb-20">
+        <p class="reveal text-sm font-semibold tracking-[0.2em] uppercase text-sea mb-4">Everything You Need</p>
+        <h2 class="reveal reveal-delay-1 font-serif text-4xl md:text-5xl lg:text-6xl font-bold">Built for Race Day</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1: Live GPS -->
+        <div class="reveal group bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-sand-dark/30 hover:border-terracotta/30">
+          <div class="w-14 h-14 bg-terracotta/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-terracotta/20 transition-colors">
+            <svg class="w-7 h-7 text-terracotta" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold mb-3">Live GPS Tracking</h3>
+          <p class="text-stone-light leading-relaxed">Real-time position on the course map. Watch the dot move through Xagħra's limestone streets — every turn, every hill.</p>
+        </div>
+
+        <!-- Feature 2: Voice Alerts -->
+        <div class="reveal reveal-delay-1 group bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-sand-dark/30 hover:border-terracotta/30">
+          <div class="w-14 h-14 bg-sea/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-sea/20 transition-colors">
+            <svg class="w-7 h-7 text-sea" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold mb-3">Voice Alerts</h3>
+          <p class="text-stone-light leading-relaxed">Pace updates, split times, and motivational nudges delivered through your earbuds. Hands-free, eyes-on-the-road.</p>
+        </div>
+
+        <!-- Feature 3: Spectator Mode -->
+        <div class="reveal reveal-delay-2 group bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-sand-dark/30 hover:border-terracotta/30">
+          <div class="w-14 h-14 bg-terracotta/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-terracotta/20 transition-colors">
+            <svg class="w-7 h-7 text-terracotta" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold mb-3">Spectator Mode</h3>
+          <p class="text-stone-light leading-relaxed">Family and friends track the runner live and send cheers that arrive as haptic taps. Feel the love mid-stride.</p>
+        </div>
+
+        <!-- Feature 4: Elevation -->
+        <div class="reveal reveal-delay-3 group bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-sand-dark/30 hover:border-terracotta/30">
+          <div class="w-14 h-14 bg-sea/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-sea/20 transition-colors">
+            <svg class="w-7 h-7 text-sea" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold mb-3">Elevation Profile</h3>
+          <p class="text-stone-light leading-relaxed">Know every climb and descent before you hit it. The Gozo hills are gorgeous — and relentless. Be ready.</p>
+        </div>
+
+        <!-- Feature 5: Themes -->
+        <div class="reveal reveal-delay-4 group bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-sand-dark/30 hover:border-terracotta/30">
+          <div class="w-14 h-14 bg-terracotta/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-terracotta/20 transition-colors">
+            <svg class="w-7 h-7 text-terracotta" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"/></svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold mb-3">Race Themes</h3>
+          <p class="text-stone-light leading-relaxed">Four curated colour palettes inspired by Gozo — limestone, sea, sunset, and terracotta. Make it yours.</p>
+        </div>
+
+        <!-- Feature 6: POI Layer -->
+        <div class="reveal reveal-delay-5 group bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-sand-dark/30 hover:border-terracotta/30">
+          <div class="w-14 h-14 bg-sea/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-sea/20 transition-colors">
+            <svg class="w-7 h-7 text-sea" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/></svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold mb-3">POI Layer</h3>
+          <p class="text-stone-light leading-relaxed">Water stations, medical points, cheer zones, and scenic viewpoints — all on your map. Run informed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- ROUTE -->
+  <!-- ============================================================ -->
+  <section id="route" class="py-24 md:py-32 bg-sand/50">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16 md:mb-20">
+        <p class="reveal text-sm font-semibold tracking-[0.2em] uppercase text-sea mb-4">The Course</p>
+        <h2 class="reveal reveal-delay-1 font-serif text-4xl md:text-5xl lg:text-6xl font-bold">21.1 Kilometres of Gozo</h2>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="reveal reveal-delay-2 grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+        <div class="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <span class="block font-serif text-3xl md:text-4xl font-bold text-terracotta">21.1</span>
+          <span class="text-sm text-stone-light font-medium">Kilometres</span>
+        </div>
+        <div class="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <span class="block font-serif text-3xl md:text-4xl font-bold text-terracotta">387m</span>
+          <span class="text-sm text-stone-light font-medium">Elevation Gain</span>
+        </div>
+        <div class="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <span class="block font-serif text-3xl md:text-4xl font-bold text-terracotta">6</span>
+          <span class="text-sm text-stone-light font-medium">Water Stations</span>
+        </div>
+        <div class="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <span class="block font-serif text-3xl md:text-4xl font-bold text-terracotta">12</span>
+          <span class="text-sm text-stone-light font-medium">Points of Interest</span>
+        </div>
+      </div>
+
+      <!-- Elevation Profile -->
+      <div class="reveal reveal-delay-3 bg-white rounded-2xl p-8 shadow-sm mb-16">
+        <h3 class="font-serif text-xl font-bold mb-2">Elevation Profile</h3>
+        <p class="text-sm text-stone-light mb-8">Metres above sea level across the 21.1 km course</p>
+        <div class="flex items-end gap-[3px] sm:gap-1 h-40 md:h-48" id="elevation-bars">
+          <!-- Bars generated by JS -->
+        </div>
+        <div class="flex justify-between mt-3 text-xs text-stone-light font-medium">
+          <span>0 km</span>
+          <span>5 km</span>
+          <span>10 km</span>
+          <span>15 km</span>
+          <span>21.1 km</span>
+        </div>
+      </div>
+
+      <!-- POI Grid -->
+      <div class="reveal">
+        <h3 class="font-serif text-2xl font-bold mb-8 text-center">Points of Interest</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">⛪</span>
+            <div><p class="font-semibold text-sm">Xagħra Parish Church</p><p class="text-xs text-stone-light">Start/Finish</p></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">🏛️</span>
+            <div><p class="font-semibold text-sm">Ġgantija Temples</p><p class="text-xs text-stone-light">KM 3.2</p></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">🌊</span>
+            <div><p class="font-semibold text-sm">Ramla Bay</p><p class="text-xs text-stone-light">KM 6.8</p></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">🧂</span>
+            <div><p class="font-semibold text-sm">Salt Pans</p><p class="text-xs text-stone-light">KM 9.1</p></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">⛰️</span>
+            <div><p class="font-semibold text-sm">Ta' Gordan Lighthouse</p><p class="text-xs text-stone-light">KM 11.5</p></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">🏰</span>
+            <div><p class="font-semibold text-sm">Cittadella</p><p class="text-xs text-stone-light">KM 14.0</p></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">🌅</span>
+            <div><p class="font-semibold text-sm">Xlendi Cliffs</p><p class="text-xs text-stone-light">KM 16.3</p></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm flex items-start gap-3">
+            <span class="text-2xl">🍷</span>
+            <div><p class="font-semibold text-sm">Ta' Mena Winery</p><p class="text-xs text-stone-light">KM 18.7</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SPECTATOR -->
+  <!-- ============================================================ -->
+  <section id="spectator" class="py-24 md:py-32">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <!-- Text side -->
+        <div>
+          <p class="reveal text-sm font-semibold tracking-[0.2em] uppercase text-sea mb-4">For the Supporters</p>
+          <h2 class="reveal reveal-delay-1 font-serif text-4xl md:text-5xl font-bold mb-6">Be There,<br>Even From Afar</h2>
+          <p class="reveal reveal-delay-2 text-lg text-stone-light leading-relaxed mb-8">
+            Open Spectator Mode, find your runner on the map, and send a cheer. They'll feel a gentle haptic tap — a pulse of encouragement when they need it most. No account needed. Just love.
+          </p>
+          <div class="reveal reveal-delay-3 flex flex-wrap gap-4">
+            <div class="flex items-center gap-2 text-sm font-medium text-stone">
+              <svg class="w-5 h-5 text-terracotta" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+              Live map view
             </div>
-            <div class="hero-visual">
-                <div class="float-badge top-left">📍 Live GPS</div>
-                <div class="float-badge top-right">🗣️ Voice Alerts</div>
-                <div class="float-badge bot-left">👀 Spectator Mode</div>
-                <div class="phone-frame">
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <div class="phone-screen-content">
-                            <div class="screen-map">
-                                <div class="route-line"></div>
-                                <div class="runner-dot"></div>
-                                <div class="km-dot" style="top:25%;left:20%"></div>
-                                <div class="km-dot" style="top:45%;left:75%"></div>
-                                <div class="km-dot" style="top:65%;left:30%"></div>
-                                <div class="km-dot" style="top:55%;left:60%"></div>
-                            </div>
-                            <div class="screen-hud">
-                                <div class="hud-title">Il-Ġirja t'Għawdex · 21.1 km</div>
-                                <div class="hud-stats">
-                                    <div class="hud-stat"><div class="hud-stat-val">13.2</div><div class="hud-stat-lbl">KM</div></div>
-                                    <div class="hud-stat"><div class="hud-stat-val">1:14:32</div><div class="hud-stat-lbl">TIME</div></div>
-                                    <div class="hud-stat"><div class="hud-stat-val">5'38"</div><div class="hud-stat-lbl">PACE</div></div>
-                                    <div class="hud-stat"><div class="hud-stat-val">+89m</div><div class="hud-stat-lbl">ELEV</div></div>
-                                </div>
-                                <div class="hud-buttons">
-                                    <div class="hud-btn hud-btn-start">▶ Running</div>
-                                    <div class="hud-btn hud-btn-spectate">👀 Spectate</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex items-center gap-2 text-sm font-medium text-stone">
+              <svg class="w-5 h-5 text-terracotta" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+              Haptic cheers
             </div>
-        </div>
-    </section>
-
-    <!-- ═══ COUNTDOWN BAR ═══ -->
-    <section class="countdown-bar">
-        <div class="countdown-label">Race Day Countdown</div>
-        <div class="countdown-grid">
-            <div class="cd-unit"><div class="cd-num" id="cd-d">--</div><div class="cd-lbl">Days</div></div>
-            <div class="cd-unit"><div class="cd-num" id="cd-h">--</div><div class="cd-lbl">Hours</div></div>
-            <div class="cd-unit"><div class="cd-num" id="cd-m">--</div><div class="cd-lbl">Minutes</div></div>
-            <div class="cd-unit"><div class="cd-num" id="cd-s">--</div><div class="cd-lbl">Seconds</div></div>
-        </div>
-        <div class="cd-race-info"><strong>Sunday, April 26th, 2026</strong> · 7:30 AM · Xagħra Square, Gozo</div>
-    </section>
-
-    <!-- ═══ FEATURES ═══ -->
-    <section class="features" id="features">
-        <div class="section-tag">Features</div>
-        <div class="section-title">Everything you need on race day</div>
-        <div class="section-desc">And the weeks of training before it. Built for Gozo's terrain, tested on the actual course.</div>
-        <div class="feature-grid">
-            <div class="f-card" style="--card-accent:var(--cyan)"><div class="f-icon cyan">📍</div><h3>Live GPS Tracking</h3><p>Your real-time position on the official 21.1km race route. Satellite map with your exact location through every village and coastal stretch.</p></div>
-            <div class="f-card" style="--card-accent:var(--coral)"><div class="f-icon coral">🗣️</div><h3>Voice KM Alerts</h3><p>Spoken updates at every kilometre — pace, distance, elevation gained. Keep your phone in your pocket. We'll tell you everything you need to hear.</p></div>
-            <div class="f-card" style="--card-accent:var(--amber)"><div class="f-icon amber">👀</div><h3>Spectator Mode</h3><p>Friends and family track you live. They see your dot on the map, your pace, your progress ring — and they can send you a cheer when the hills hit.</p></div>
-            <div class="f-card" style="--card-accent:var(--emerald)"><div class="f-icon emerald">📊</div><h3>Elevation Profile</h3><p>Interactive chart showing every climb from sea level to 144m. Know what's ahead. The hills of Gozo don't surprise you twice.</p></div>
-            <div class="f-card" style="--card-accent:var(--violet)"><div class="f-icon violet">🎨</div><h3>4 Beautiful Themes</h3><p>Dark Cyan for dawn, Light Coral for golden hour, Spectator Dark for the crowd. Switch live — no restart, instant vibes.</p></div>
-            <div class="f-card" style="--card-accent:var(--rose)"><div class="f-icon rose">🗺️</div><h3>Full POI Layer</h3><p>Water stations, first aid, marshals, parking, music stages, toilets, and every turn direction — all on the map before you lace up.</p></div>
-        </div>
-    </section>
-
-    <!-- ═══ ROUTE ═══ -->
-    <section class="route" id="route">
-        <div class="route-header">
-            <div class="section-tag">The Route</div>
-            <div class="route-maltese">Il-Ġirja t'Għawdex</div>
-            <div class="section-title">21.1 km through paradise</div>
-            <div class="section-desc" style="margin:0 auto">From Xagħra Square past the Marsalforn salt pans, along the northern coast, through Victoria, past Ta' Pinu Shrine — and back home.</div>
-        </div>
-
-        <div class="route-stats-grid">
-            <div class="r-stat"><div class="r-stat-val">21.1</div><div class="r-stat-lbl">Kilometres</div><div class="r-stat-sub">Official half marathon</div></div>
-            <div class="r-stat"><div class="r-stat-val">6m</div><div class="r-stat-lbl">Min Elevation</div><div class="r-stat-sub">Sea level start</div></div>
-            <div class="r-stat"><div class="r-stat-val">144m</div><div class="r-stat-lbl">Max Elevation</div><div class="r-stat-sub">The big climb</div></div>
-            <div class="r-stat"><div class="r-stat-val">664</div><div class="r-stat-lbl">Track Points</div><div class="r-stat-sub">GPS precision</div></div>
-        </div>
-
-        <div class="elev-container">
-            <div class="elev-label">Elevation Profile</div>
-            <div class="elev-chart" id="elev-chart"></div>
-            <div class="elev-range"><span>0 km</span><span>5 km</span><span>10 km</span><span>15 km</span><span>21.1 km</span></div>
-        </div>
-
-        <div class="poi-grid">
-            <div class="poi"><div class="poi-emoji">💧</div><div><div class="poi-text">Water Stations</div><div class="poi-sub">Every ~3 km</div></div></div>
-            <div class="poi"><div class="poi-emoji">🏥</div><div><div class="poi-text">First Aid</div><div class="poi-sub">4 medical points</div></div></div>
-            <div class="poi"><div class="poi-emoji">🚻</div><div><div class="poi-text">Toilets</div><div class="poi-sub">Start + route</div></div></div>
-            <div class="poi"><div class="poi-emoji">🎵</div><div><div class="poi-text">Music Stages</div><div class="poi-sub">Live entertainment</div></div></div>
-            <div class="poi"><div class="poi-emoji">🅿️</div><div><div class="poi-text">Free Parking</div><div class="poi-sub">Mġarr + Xagħra</div></div></div>
-            <div class="poi"><div class="poi-emoji">🚌</div><div><div class="poi-text">Free Transport</div><div class="poi-sub">Mġarr → Xagħra</div></div></div>
-        </div>
-    </section>
-
-    <!-- ═══ THEMES ═══ -->
-    <section class="themes" id="themes">
-        <div class="section-tag">Personalise</div>
-        <div class="section-title">4 hand-crafted themes</div>
-        <div class="section-desc">Switch instantly, mid-run if you want. Each one designed for a different moment.</div>
-        <div class="theme-grid">
-            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-dark-cyan"><div class="dot"></div></div><div class="theme-name">Dark Cyan</div><div class="theme-desc">Dawn runs. Cool and focused.</div></div>
-            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-dark-default"><div class="dot"></div></div><div class="theme-name">Dark Default</div><div class="theme-desc">Clean and classic. Night mode.</div></div>
-            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-light-coral"><div class="dot"></div></div><div class="theme-name">Light Coral</div><div class="theme-desc">Golden hour. Warm and alive.</div></div>
-            <div class="theme-card" style="background:var(--bg-card)"><div class="theme-swatch t-spectator"><div class="dot"></div></div><div class="theme-name">Spectator Dark</div><div class="theme-desc">For the crowd. Mint and electric.</div></div>
-        </div>
-    </section>
-
-    <!-- ═══ SPECTATOR ═══ -->
-    <section class="spectator" id="spectator">
-        <div class="spec-layout">
-            <div>
-                <div class="section-tag">For the people who love you</div>
-                <div class="section-title">Spectator Mode</div>
-                <div class="section-desc">They can't be at every kilometre. But they can be with you on every kilometre.</div>
-                <ul class="spec-features">
-                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(0,188,212,.1)">📍</div><div><h4>Live Runner Tracking</h4><p>See the runner's exact position on the course map in real time.</p></div></li>
-                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(255,107,107,.1)">👏</div><div><h4>Send a Cheer</h4><p>One tap. The runner feels a haptic buzz and sees your encouragement. When km 18 hits and the legs are screaming — that cheer matters.</p></div></li>
-                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(245,158,11,.1)">📊</div><div><h4>Progress Ring</h4><p>Visual percentage of the race completed. Watch it fill up. Hold your breath at 90%.</p></div></li>
-                    <li class="spec-feat"><div class="spec-feat-icon" style="background:rgba(16,185,129,.1)">⏱️</div><div><h4>Pace & Distance</h4><p>Real-time pace, total distance, and elevation — everything the runner sees, the spectator sees too.</p></div></li>
-                </ul>
+            <div class="flex items-center gap-2 text-sm font-medium text-stone">
+              <svg class="w-5 h-5 text-terracotta" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+              No sign-up required
             </div>
-            <div class="cheer-demo">
-                <div class="cheer-runner">
-                    <div class="cheer-avatar">🏃‍♀️</div>
-                    <div><div class="cheer-name">Fiona</div><div class="cheer-pace">13.1 km · 5'42" pace · +89m elev</div></div>
-                </div>
-                <div class="cheer-progress"><div class="cheer-progress-fill"></div></div>
-                <button class="cheer-btn" onclick="this.textContent='🎉 Cheer sent!';this.style.background='#10B981';setTimeout(()=>{this.textContent='👏 Send a Cheer!';this.style.background='var(--coral)'},3000)">👏 Send a Cheer!</button>
-            </div>
+          </div>
         </div>
-    </section>
 
-    <!-- ═══ LOVE LETTER ═══ -->
-    <section class="love">
-        <h2>Made with love in Gozo</h2>
-        <p>This app was born in <span class="hl">Xagħra</span>, in a 400-year-old townhouse, built by someone who thinks the best way to show love is to make sure you never run alone.</p>
-        <p>The Gozo Half Marathon winds through ancient villages, past the Marsalforn salt pans, along limestone cliffs, up hills that earn every view. Past Ta' Pinu Shrine, through Victoria's narrow streets, and back to Xagħra Square — where it all started.</p>
-        <p>This app knows every turn, every climb, every water station. It was made for one runner in particular — but it'll be there for every runner who needs it.</p>
-        <p><span class="hl">Run, Fiona. We'll be watching.</span></p>
-        <div class="signature">— with love, from the house on Triq il-Knisja 🦞</div>
-    </section>
+        <!-- Cheer card mockup -->
+        <div class="reveal reveal-delay-2">
+          <div class="bg-white rounded-3xl p-8 shadow-lg border border-sand-dark/30 max-w-sm mx-auto lg:mx-0 lg:ml-auto">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-14 h-14 bg-terracotta/10 rounded-full flex items-center justify-center">
+                <span class="text-2xl">🏃‍♀️</span>
+              </div>
+              <div>
+                <p class="font-serif font-bold text-lg">Fiona</p>
+                <p class="text-sm text-stone-light">KM 14.2 · Pace 5:32/km</p>
+              </div>
+            </div>
+            <div class="bg-sand rounded-xl p-4 mb-6">
+              <div class="flex justify-between text-sm mb-2">
+                <span class="text-stone-light">Distance</span>
+                <span class="font-semibold">14.2 / 21.1 km</span>
+              </div>
+              <div class="w-full bg-sand-dark rounded-full h-2.5">
+                <div class="bg-terracotta rounded-full h-2.5" style="width: 67%"></div>
+              </div>
+            </div>
+            <div class="text-center">
+              <p id="cheer-count" class="text-sm text-stone-light mb-3">
+                <span id="cheer-num" class="font-bold text-terracotta">0</span> cheers sent
+              </p>
+              <button id="cheer-btn" onclick="sendCheer()" class="w-full bg-terracotta text-white font-semibold py-4 rounded-xl text-lg hover:bg-terracotta-dark transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-terracotta focus-visible:ring-offset-2">
+                📣 Send a Cheer!
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <footer>
-        <div class="footer-logo">Run Fiona Run</div>
-        <p>Gozo Half Marathon · April 26, 2026 · Xagħra Square</p>
-        <p>Made with <span class="heart">♥</span> in Xagħra, Gozo</p>
-        <p style="margin-top:1rem;font-size:.75rem">© 2026 Run Fiona Run</p>
-    </footer>
+  <!-- ============================================================ -->
+  <!-- THEMES -->
+  <!-- ============================================================ -->
+  <section id="themes" class="py-24 md:py-32 bg-sand/50">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <p class="reveal text-sm font-semibold tracking-[0.2em] uppercase text-sea mb-4">Personalise</p>
+      <h2 class="reveal reveal-delay-1 font-serif text-4xl md:text-5xl font-bold mb-6">Race Day Themes</h2>
+      <p class="reveal reveal-delay-2 text-lg text-stone-light max-w-2xl mx-auto mb-16">
+        Four palettes inspired by the island. Pick the one that matches your mood — or your kit.
+      </p>
 
-    <script>
-        const race = new Date('2026-04-26T07:30:00+02:00');
-        function tick(){
-            const d=race-new Date();
-            if(d<=0)return;
-            const D=Math.floor(d/864e5),H=Math.floor(d%864e5/36e5),M=Math.floor(d%36e5/6e4),S=Math.floor(d%6e4/1e3);
-            document.getElementById('hero-days').textContent=D;
-            document.getElementById('cd-d').textContent=D;
-            document.getElementById('cd-h').textContent=H;
-            document.getElementById('cd-m').textContent=M;
-            document.getElementById('cd-s').textContent=S;
-        }
-        tick();setInterval(tick,1000);
+      <div class="reveal reveal-delay-3 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+        <!-- Limestone -->
+        <div class="group cursor-pointer">
+          <div class="aspect-square rounded-2xl mb-4 shadow-sm border-4 border-transparent group-hover:border-stone/20 transition-all overflow-hidden"
+               style="background: linear-gradient(135deg, #F5EDE4 0%, #D4C5B2 50%, #B8A894 100%);">
+          </div>
+          <p class="font-serif font-bold">Limestone</p>
+          <p class="text-xs text-stone-light">Warm · Classic</p>
+        </div>
+        <!-- Mediterranean -->
+        <div class="group cursor-pointer">
+          <div class="aspect-square rounded-2xl mb-4 shadow-sm border-4 border-transparent group-hover:border-stone/20 transition-all overflow-hidden"
+               style="background: linear-gradient(135deg, #2D7D9A 0%, #4BA8C9 50%, #89CFF0 100%);">
+          </div>
+          <p class="font-serif font-bold">Mediterranean</p>
+          <p class="text-xs text-stone-light">Cool · Fresh</p>
+        </div>
+        <!-- Sunset -->
+        <div class="group cursor-pointer">
+          <div class="aspect-square rounded-2xl mb-4 shadow-sm border-4 border-transparent group-hover:border-stone/20 transition-all overflow-hidden"
+               style="background: linear-gradient(135deg, #F4845F 0%, #F7B267 50%, #F7DB6A 100%);">
+          </div>
+          <p class="font-serif font-bold">Sunset</p>
+          <p class="text-xs text-stone-light">Golden · Vibrant</p>
+        </div>
+        <!-- Terracotta -->
+        <div class="group cursor-pointer">
+          <div class="aspect-square rounded-2xl mb-4 shadow-sm border-4 border-transparent group-hover:border-stone/20 transition-all overflow-hidden"
+               style="background: linear-gradient(135deg, #C75B39 0%, #A94B2E 50%, #8B3A22 100%);">
+          </div>
+          <p class="font-serif font-bold">Terracotta</p>
+          <p class="text-xs text-stone-light">Bold · Earthy</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Elevation profile (approximation of real GPX data)
-        const elevData=[6,8,12,18,28,42,55,68,80,95,108,118,128,135,140,144,138,125,112,98,85,72,62,55,48,42,38,35,32,30,28,25,22,20,18,16,15,14,12,10,8,6];
-        const chart=document.getElementById('elev-chart');
-        const max=Math.max(...elevData);
-        elevData.forEach(v=>{
-            const bar=document.createElement('div');
-            bar.className='elev-bar';
-            bar.style.height=Math.max(4,v/max*100)+'%';
-            bar.title=v+'m';
-            chart.appendChild(bar);
+  <!-- ============================================================ -->
+  <!-- LOVE LETTER -->
+  <!-- ============================================================ -->
+  <section id="love" class="py-24 md:py-32">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <p class="reveal text-sm font-semibold tracking-[0.2em] uppercase text-terracotta mb-4">A Note</p>
+      <h2 class="reveal reveal-delay-1 font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-10">
+        Made with Love<br>in Gozo
+      </h2>
+      <div class="reveal reveal-delay-2 max-w-2xl mx-auto">
+        <p class="text-lg md:text-xl text-stone-light leading-relaxed mb-8">
+          This app started as a simple idea: what if race day felt less like logistics and more like magic? What if your people could cheer you on from anywhere? What if every hill had a name and every view had a moment?
+        </p>
+        <p class="text-lg md:text-xl text-stone-light leading-relaxed mb-8">
+          Gozo is a small island with a big heart. The half marathon winds through 5,000 years of history, past temples older than the pyramids, along cliffs that drop into impossibly blue water, through villages where everyone knows your name.
+        </p>
+        <p class="text-lg md:text-xl text-stone-light leading-relaxed mb-12">
+          This app is for the runners and the people who love them. It's for the ones standing on the corner at KM 18, shouting themselves hoarse. It's for the ones tracking a dot on a map from three time zones away, willing it forward.
+        </p>
+      </div>
+
+      <div class="reveal reveal-delay-3">
+        <p class="font-serif text-3xl md:text-4xl font-bold italic text-terracotta mb-6">
+          Run, Fiona. We'll be watching.
+        </p>
+        <p class="text-stone-light text-lg">
+          — with love, from the house on Triq il-Knisja 🦞
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================================ -->
+  <footer class="bg-stone text-white/70 py-16">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-3 gap-10 mb-12">
+        <div>
+          <p class="font-serif text-2xl font-bold text-white mb-3">
+            Run <span class="italic text-terracotta">Fiona</span> Run
+          </p>
+          <p class="text-sm leading-relaxed">
+            The iOS companion app for the Gozo Half Marathon. Built with care in Xagħra.
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-white mb-3 text-sm uppercase tracking-wider">Links</p>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+            <li><a href="#route" class="hover:text-white transition-colors">Route</a></li>
+            <li><a href="#spectator" class="hover:text-white transition-colors">Spectator Mode</a></li>
+            <li><a href="#themes" class="hover:text-white transition-colors">Themes</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-semibold text-white mb-3 text-sm uppercase tracking-wider">Race Info</p>
+          <ul class="space-y-2 text-sm">
+            <li>Sunday, April 26, 2026</li>
+            <li>7:30 AM · Xagħra Square</li>
+            <li>21.1 km · Half Marathon</li>
+            <li>Gozo, Malta 🇲🇹</li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm">&copy; 2026 Run Fiona Run. Made in Gozo with ❤️</p>
+        <p class="text-xs text-white/40">A love letter, disguised as an app.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- SCRIPTS -->
+  <!-- ============================================================ -->
+  <script>
+    // ── Countdown ──────────────────────────────────────────────
+    const raceDate = new Date('2026-04-26T07:30:00+02:00').getTime();
+
+    function updateCountdown() {
+      const now = Date.now();
+      const diff = raceDate - now;
+
+      if (diff <= 0) {
+        document.getElementById('cd-days').textContent = '0';
+        document.getElementById('cd-hours').textContent = '0';
+        document.getElementById('cd-mins').textContent = '0';
+        document.getElementById('cd-secs').textContent = '0';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const secsEl = document.getElementById('cd-secs');
+      const prev = secsEl.textContent;
+
+      document.getElementById('cd-days').textContent = days;
+      document.getElementById('cd-hours').textContent = hours;
+      document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+      secsEl.textContent = String(secs).padStart(2, '0');
+
+      // Tick animation on seconds change
+      if (prev !== String(secs).padStart(2, '0')) {
+        secsEl.classList.remove('tick-anim');
+        void secsEl.offsetWidth; // reflow
+        secsEl.classList.add('tick-anim');
+      }
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // ── Elevation Bars ────────────────────────────────────────
+    const elevationData = [
+      95, 100, 110, 125, 140, 150, 145, 130, 110, 90,
+      75, 60, 50, 45, 55, 70, 90, 115, 140, 160,
+      175, 185, 190, 180, 165, 145, 125, 105, 85, 70,
+      60, 55, 65, 80, 100, 120, 145, 155, 150, 135,
+      115, 95, 80, 70, 65, 75, 90, 105, 120, 110,
+      95, 85, 80, 90, 105, 115, 125, 130, 120, 105,
+    ];
+
+    const maxElev = Math.max(...elevationData);
+    const barsContainer = document.getElementById('elevation-bars');
+
+    elevationData.forEach((val, i) => {
+      const bar = document.createElement('div');
+      const pct = (val / maxElev) * 100;
+      bar.className = 'elev-bar flex-1 rounded-t-sm min-w-[2px]';
+      bar.style.height = '0%';
+      bar.style.background = pct > 80
+        ? '#C75B39'
+        : pct > 50
+          ? '#2D7D9A'
+          : '#D4C5B2';
+      bar.title = `${val}m`;
+      barsContainer.appendChild(bar);
+
+      // Animate in after a delay
+      setTimeout(() => {
+        bar.style.height = pct + '%';
+      }, 200 + i * 30);
+    });
+
+    // ── Cheer Button ──────────────────────────────────────────
+    let cheerCount = 0;
+
+    function sendCheer() {
+      cheerCount++;
+      document.getElementById('cheer-num').textContent = cheerCount;
+
+      const btn = document.getElementById('cheer-btn');
+      btn.classList.remove('cheer-burst');
+      void btn.offsetWidth;
+      btn.classList.add('cheer-burst');
+
+      // Change emoji sequence
+      const emojis = ['📣', '🎉', '💪', '❤️', '🔥', '⚡', '🙌', '👏'];
+      const emoji = emojis[cheerCount % emojis.length];
+      btn.textContent = `${emoji} Cheer Sent!`;
+
+      setTimeout(() => {
+        btn.textContent = '📣 Send a Cheer!';
+      }, 1500);
+    }
+
+    // ── Intersection Observer (Reveal) ────────────────────────
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
         });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+    );
 
-        // Intersection observer for animations
-        const observer=new IntersectionObserver(entries=>{
-            entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}});
-        },{threshold:0.1});
-        document.querySelectorAll('.f-card,.r-stat,.theme-card,.poi,.spec-feat').forEach(el=>{
-            el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition='all 0.5s ease';
-            observer.observe(el);
-        });
-    </script>
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+    // ── Nav scroll effect ─────────────────────────────────────
+    const nav = document.getElementById('nav');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y > 100) {
+        nav.classList.add('shadow-sm');
+      } else {
+        nav.classList.remove('shadow-sm');
+      }
+      lastScroll = y;
+    }, { passive: true });
+  </script>
+
 </body>
 </html>
