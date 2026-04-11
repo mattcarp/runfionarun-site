@@ -164,6 +164,49 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      padding: 1rem 2rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      z-index: 100;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(199, 91, 57, 0.3);
+      background: #3D3D3D;
+      color: #FFFAF5;
+    }
+    [data-theme="dark"] .toast {
+      background: #1A1D24;
+      color: #E0E0E0;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Hero topo pattern */
+    .hero-topo {
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      background-size: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C75B39' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    /* New badge pulse */
+    @keyframes new-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .badge-new { animation: new-pulse 2.5s ease-in-out infinite; }
+
   </style>
 </head>
 
@@ -189,7 +232,7 @@
           <svg class="moon absolute" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
           <svg class="sun absolute" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
         </button>
-        <a href="#hero" class="inline-flex items-center gap-2 bg-terracotta text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-terracotta-dark transition-colors focus-visible:ring-2 focus-visible:ring-terracotta">
+        <a href="#" onclick="showDownloadToast(event)" class="inline-flex items-center gap-2 bg-terracotta text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-terracotta-dark transition-colors focus-visible:ring-2 focus-visible:ring-terracotta">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
           Download
         </a>
@@ -201,6 +244,8 @@
   <!-- HERO -->
   <!-- ============================================================ -->
   <section id="hero" class="relative min-h-[85vh] flex items-center justify-center pt-16 overflow-hidden">
+    <!-- Subtle topographic pattern -->
+    <div class="hero-topo"></div>
     <!-- Hero background: waiting for real photos -->
     <!-- Decorative background circles -->
     <div class="absolute top-20 -right-32 w-96 h-96 bg-terracotta/5 rounded-full blur-3xl"></div>
@@ -225,7 +270,7 @@
       </p>
 
       <div class="reveal reveal-delay-4 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-        <a href="#countdown" class="inline-flex items-center gap-2 bg-terracotta text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-terracotta-dark transition-all hover:shadow-lg hover:shadow-terracotta/20 focus-visible:ring-2 focus-visible:ring-terracotta">
+        <a href="#" onclick="showDownloadToast(event)" class="inline-flex items-center gap-2 bg-terracotta text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-terracotta-dark transition-all hover:shadow-lg hover:shadow-terracotta/20 focus-visible:ring-2 focus-visible:ring-terracotta">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
           Download for iOS
         </a>
@@ -336,6 +381,18 @@
           </div>
           <h3 class="font-serif text-xl font-bold mb-3">POI Layer</h3>
           <p class="text-stone-light leading-relaxed">Water stations, medical points, cheer zones, and scenic viewpoints — all on your map. Run informed.</p>
+        </div>
+
+        <!-- Feature 7: Look Ahead (NEW) -->
+        <div class="reveal group bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-sand-dark/30 hover:border-terracotta/30 md:col-span-2 lg:col-span-1">
+          <div class="w-14 h-14 bg-sea/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-sea/20 transition-colors">
+            <svg class="w-7 h-7 text-sea" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div class="flex items-center gap-2 mb-3">
+            <h3 class="font-serif text-xl font-bold">Look Ahead</h3>
+            <span class="badge-new text-xs font-semibold bg-terracotta/15 text-terracotta px-2.5 py-0.5 rounded-full uppercase tracking-wider">New</span>
+          </div>
+          <p class="text-stone-light leading-relaxed">Street-level preview of what lies ahead. See the next 500 metres of your route in immersive 3D &mdash; before you reach it.</p>
         </div>
       </div>
     </div>
@@ -757,6 +814,21 @@
       }
       lastScroll = y;
     }, { passive: true });
+  </script>
+
+
+  <!-- Toast notification -->
+  <div id="download-toast" class="toast">
+    &#127939; Available race day &mdash; April 26th! Side-load via Xcode.
+  </div>
+
+  <script>
+    function showDownloadToast(e) {
+      e.preventDefault();
+      var toast = document.getElementById('download-toast');
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 3500);
+    }
   </script>
 
 </body>
