@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Feedback · Run Fiona Run</title>
+  <meta name="description" content="Voice feedback captured by the Run Fiona Run iOS app.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['selector', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FFFAF5',
+            terracotta: '#C75B39',
+            'terracotta-dark': '#A94B2E',
+            sea: '#2D7D9A',
+            'sea-dark': '#246579',
+            stone: '#3D3D3D',
+            'stone-light': '#6B6B6B',
+            sand: '#F5EDE4',
+            'sand-dark': '#E8DDD0',
+            night: '#0F1115',
+            'night-card': '#1A1D24',
+            'night-border': '#2A2D35',
+            'night-text': '#E0E0E0',
+            'night-muted': '#8A8F9A',
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: .08s; } .reveal-d2 { transition-delay: .16s; }
+    .reveal-d3 { transition-delay: .24s; } .reveal-d4 { transition-delay: .32s; }
+
+    [data-theme="dark"] body { background: #0F1115; color: #E0E0E0; }
+    [data-theme="dark"] .bg-cream { background: #0F1115; }
+    [data-theme="dark"] .bg-cream\/80 { background: rgba(15,17,21,0.8); }
+    [data-theme="dark"] .bg-sand\/50 { background: rgba(26,29,36,0.5); }
+    [data-theme="dark"] .bg-white { background: #1A1D24; }
+    [data-theme="dark"] .bg-sand { background: #1A1D24; }
+    [data-theme="dark"] .text-stone { color: #E0E0E0; }
+    [data-theme="dark"] .text-stone-light { color: #8A8F9A; }
+    [data-theme="dark"] .border-sand-dark\/50 { border-color: rgba(42,45,53,0.5); }
+    [data-theme="dark"] .border-sand-dark\/30 { border-color: rgba(42,45,53,0.3); }
+    [data-theme="dark"] .bg-sand-dark { background: #2A2D35; }
+    [data-theme="dark"] .bg-stone { background: #0A0C0F; }
+    [data-theme="dark"] .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+    [data-theme="dark"] .shadow-lg { box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+
+    .theme-toggle { position: relative; width: 40px; height: 40px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background .2s; }
+    .theme-toggle:hover { background: rgba(128,128,128,0.15); }
+    .theme-toggle svg { width: 20px; height: 20px; transition: transform .3s, opacity .3s; }
+    .theme-toggle .sun { opacity: 0; transform: rotate(-90deg) scale(.5); }
+    .theme-toggle .moon { opacity: 1; transform: rotate(0deg) scale(1); }
+    [data-theme="dark"] .theme-toggle .sun { opacity: 1; transform: rotate(0deg) scale(1); }
+    [data-theme="dark"] .theme-toggle .moon { opacity: 0; transform: rotate(90deg) scale(.5); }
+
+    *:focus-visible { outline: 3px solid #2D7D9A; outline-offset: 3px; border-radius: 4px; }
+    .nav-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+    .hero-topo { position: absolute; inset: 0; opacity: .035; background-size: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C75B39' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    #map { height: 480px; border-radius: 1rem; z-index: 0; }
+    [data-theme="dark"] .leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
+    [data-theme="dark"] .leaflet-container { background: #0F1115; }
+    .leaflet-popup-content-wrapper { border-radius: 12px; font-family: Inter, system-ui, sans-serif; }
+    .leaflet-popup-content { margin: 12px 14px; font-size: 13px; line-height: 1.5; }
+    .leaflet-popup-content .ts { font-size: 11px; color: #6B6B6B; margin-top: 6px; }
+
+    .quote-mark { font-family: 'Playfair Display', serif; font-size: 3.5rem; line-height: 1; color: rgba(199,91,57,0.18); user-select: none; }
+    [data-theme="dark"] .quote-mark { color: rgba(199,91,57,0.3); }
+
+    @keyframes live-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(199,91,57,0.55); }
+      70%      { box-shadow: 0 0 0 10px rgba(199,91,57,0); }
+    }
+    .live-dot { width: 8px; height: 8px; background: #C75B39; border-radius: 50%; animation: live-pulse 2s infinite; }
+
+    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    .skeleton { background: linear-gradient(90deg, rgba(0,0,0,.06) 0%, rgba(0,0,0,.12) 50%, rgba(0,0,0,.06) 100%); background-size: 800px 100%; animation: shimmer 1.6s linear infinite; border-radius: 6px; }
+    [data-theme="dark"] .skeleton { background: linear-gradient(90deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.10) 50%, rgba(255,255,255,.04) 100%); background-size: 800px 100%; }
+
+    .chart-wrap { position: relative; height: 260px; }
+  </style>
+</head>
+
+<body class="bg-cream text-stone font-sans antialiased">
+
+  <nav id="nav" class="fixed top-0 left-0 right-0 z-50 nav-blur bg-cream/80 border-b border-sand-dark/50 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="font-serif text-xl font-bold tracking-tight">
+        Run <span class="italic text-terracotta">Fiona</span> Run
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm font-medium text-stone-light">
+        <span class="inline-flex items-center gap-2">
+          <span class="live-dot"></span>
+          <span class="uppercase tracking-[0.18em] text-[11px]">Feedback · Private</span>
+        </span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+          <svg class="moon absolute" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+          <svg class="sun absolute" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+        </button>
+        <button id="refresh-btn" onclick="loadData(true)" class="inline-flex items-center gap-2 bg-terracotta text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-terracotta-dark transition-colors focus-visible:ring-2 focus-visible:ring-terracotta">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="relative min-h-[40vh] flex items-center justify-center pt-24 pb-10 overflow-hidden">
+    <div class="hero-topo"></div>
+    <div class="absolute top-16 -right-24 w-80 h-80 bg-terracotta/5 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-10 -left-24 w-80 h-80 bg-sea/5 rounded-full blur-3xl"></div>
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <p class="reveal text-sm md:text-base font-semibold tracking-[0.2em] uppercase text-sea mb-6">
+        Voice feedback · Captured mid-run
+      </p>
+      <h1 class="reveal reveal-d1 font-serif text-5xl sm:text-6xl md:text-7xl font-bold leading-[0.95] tracking-tight mb-6">
+        What <span class="italic text-terracotta">Fiona</span> Said
+      </h1>
+      <p class="reveal reveal-d2 max-w-2xl mx-auto text-lg text-stone-light leading-relaxed">
+        Every time she taps the button mid-run, her voice is transcribed on-device and stored here &mdash; with GPS, pace, and app version. This page is just for us.
+      </p>
+    </div>
+  </section>
+
+  <section class="pb-12">
+    <div class="max-w-6xl mx-auto px-6">
+      <div id="stat-cards" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        <div class="reveal bg-white rounded-2xl p-6 shadow-sm border border-sand-dark/30">
+          <p class="text-xs uppercase tracking-[0.18em] text-stone-light font-semibold mb-2">Total</p>
+          <p class="font-serif text-4xl md:text-5xl font-bold text-terracotta" data-stat="total">&mdash;</p>
+          <p class="text-xs text-stone-light mt-1">feedback entries</p>
+        </div>
+        <div class="reveal reveal-d1 bg-white rounded-2xl p-6 shadow-sm border border-sand-dark/30">
+          <p class="text-xs uppercase tracking-[0.18em] text-stone-light font-semibold mb-2">With GPS</p>
+          <p class="font-serif text-4xl md:text-5xl font-bold text-sea" data-stat="with_gps">&mdash;</p>
+          <p class="text-xs text-stone-light mt-1" data-stat="with_gps_pct">&mdash;</p>
+        </div>
+        <div class="reveal reveal-d2 bg-white rounded-2xl p-6 shadow-sm border border-sand-dark/30">
+          <p class="text-xs uppercase tracking-[0.18em] text-stone-light font-semibold mb-2">Devices</p>
+          <p class="font-serif text-4xl md:text-5xl font-bold text-terracotta" data-stat="devices">&mdash;</p>
+          <p class="text-xs text-stone-light mt-1" data-stat="versions">&mdash;</p>
+        </div>
+        <div class="reveal reveal-d3 bg-white rounded-2xl p-6 shadow-sm border border-sand-dark/30">
+          <p class="text-xs uppercase tracking-[0.18em] text-stone-light font-semibold mb-2">Last heard</p>
+          <p class="font-serif text-2xl md:text-3xl font-bold text-sea" data-stat="last_relative">&mdash;</p>
+          <p class="text-xs text-stone-light mt-1 font-mono" data-stat="last_absolute">&mdash;</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-12">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-5 gap-6">
+      <div class="reveal bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-dark/30 lg:col-span-2">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h3 class="font-serif text-xl font-bold">Feedback over time</h3>
+            <p class="text-xs text-stone-light mt-1">Daily count &middot; last 30 days</p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chart-timeline"></canvas>
+        </div>
+      </div>
+
+      <div class="reveal reveal-d1 bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sand-dark/30 lg:col-span-3">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h3 class="font-serif text-xl font-bold">Where she spoke</h3>
+            <p class="text-xs text-stone-light mt-1">Each pin is a voice feedback with GPS &middot; tap for transcript</p>
+          </div>
+          <span id="map-count" class="text-xs font-mono text-stone-light"></span>
+        </div>
+        <div id="map"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-24">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex items-end justify-between mb-8">
+        <div>
+          <p class="text-sm font-semibold tracking-[0.2em] uppercase text-sea mb-2">In her own words</p>
+          <h2 class="font-serif text-3xl md:text-4xl font-bold">Transcripts</h2>
+        </div>
+        <div class="flex items-center gap-3 text-xs text-stone-light">
+          <label class="font-medium uppercase tracking-wider" for="filter-device">Filter</label>
+          <select id="filter-device" class="bg-white border border-sand-dark/50 rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-sea">
+            <option value="">All devices</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="transcripts" class="grid md:grid-cols-2 gap-4 md:gap-6">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-dark/30">
+          <div class="skeleton h-4 w-1/3 mb-4"></div>
+          <div class="skeleton h-3 w-full mb-2"></div>
+          <div class="skeleton h-3 w-5/6 mb-2"></div>
+          <div class="skeleton h-3 w-2/3"></div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-dark/30">
+          <div class="skeleton h-4 w-1/3 mb-4"></div>
+          <div class="skeleton h-3 w-full mb-2"></div>
+          <div class="skeleton h-3 w-4/6 mb-2"></div>
+          <div class="skeleton h-3 w-3/4"></div>
+        </div>
+      </div>
+
+      <p id="empty-state" class="hidden text-center text-stone-light py-16 text-lg italic">
+        Aucun retour pour l'instant &mdash; no feedback yet.
+      </p>
+      <p id="error-state" class="hidden text-center text-terracotta py-16 text-sm font-mono"></p>
+    </div>
+  </section>
+
+  <footer class="bg-stone text-white/70 py-10">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-sm">
+        <a href="/" class="hover:text-white transition-colors">&larr; Back to Run Fiona Run</a>
+      </p>
+      <p class="text-xs text-white/40 font-mono">private &middot; noindex &middot; rendered: <span id="build-ts"></span></p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <script>
+    // ── Config ─────────────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://cnmzahjpvxtnsvhnguqe.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_IIYa7pcz7LXsIdke9RxQiw_DIzMA1-4';
+    const TABLE = 'runner_feedback';
+    const RACE_START = [36.0506, 14.2686]; // Xagħra Square
+
+    // ── DOM helpers (safe construction, no innerHTML) ──────────────────
+    function el(tag, opts = {}, ...kids) {
+      const node = document.createElement(tag);
+      if (opts.class) node.className = opts.class;
+      if (opts.text != null) node.textContent = opts.text;
+      if (opts.title) node.title = opts.title;
+      if (opts.href) node.href = opts.href;
+      if (opts.target) node.target = opts.target;
+      if (opts.rel) node.rel = opts.rel;
+      if (opts.attrs) for (const k in opts.attrs) node.setAttribute(k, opts.attrs[k]);
+      if (opts.style) for (const k in opts.style) node.style[k] = opts.style[k];
+      for (const k of kids) if (k != null) node.appendChild(typeof k === 'string' ? document.createTextNode(k) : k);
+      return node;
+    }
+    function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+    function svgNS(tag, attrs = {}) {
+      const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const k in attrs) n.setAttribute(k, attrs[k]);
+      return n;
+    }
+
+    // ── Theme ──────────────────────────────────────────────────────────
+    function toggleTheme() {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('rfr-theme', next);
+      if (window.__timelineChart) renderTimeline(window.__lastRows || []);
+    }
+    (function initTheme() {
+      const saved = localStorage.getItem('rfr-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+      else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+
+    // ── Reveal observer ────────────────────────────────────────────────
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => e.isIntersecting && e.target.classList.add('visible')),
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach(e => io.observe(e));
+
+    // ── Formatters ─────────────────────────────────────────────────────
+    const fmt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+    function relative(ts) {
+      const d = new Date(ts);
+      const diff = Date.now() - d.getTime();
+      const mins = Math.round(diff / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return `${mins} min ago`;
+      const hours = Math.round(mins / 60);
+      if (hours < 24) return `${hours} hr ago`;
+      const days = Math.round(hours / 24);
+      if (days < 14) return `${days} day${days === 1 ? '' : 's'} ago`;
+      return fmt.format(d);
+    }
+
+    // ── Data load ──────────────────────────────────────────────────────
+    async function loadData(manual = false) {
+      const btn = document.getElementById('refresh-btn');
+      if (manual && btn) { btn.disabled = true; btn.style.opacity = 0.6; }
+      const err = document.getElementById('error-state');
+      err.classList.add('hidden');
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=recorded_at.desc&limit=500`;
+        const res = await fetch(url, {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            Prefer: 'count=exact',
+          },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const rows = await res.json();
+        window.__lastRows = rows;
+        renderAll(rows);
+      } catch (e) {
+        console.error(e);
+        err.textContent = `Failed to load feedback: ${e.message}`;
+        err.classList.remove('hidden');
+        clear(document.getElementById('transcripts'));
+      } finally {
+        if (manual && btn) { btn.disabled = false; btn.style.opacity = 1; }
+      }
+    }
+
+    function renderAll(rows) {
+      renderStats(rows);
+      renderTimeline(rows);
+      renderMap(rows);
+      renderDeviceFilter(rows);
+      renderTranscripts(rows);
+    }
+
+    // ── Stats ──────────────────────────────────────────────────────────
+    function setStat(name, value) {
+      const node = document.querySelector(`[data-stat="${name}"]`);
+      if (node) node.textContent = value;
+    }
+    function renderStats(rows) {
+      const total = rows.length;
+      const withGps = rows.filter(r => r.latitude != null && r.longitude != null).length;
+      const devices = new Set(rows.map(r => r.device).filter(Boolean));
+      const versions = new Set(rows.map(r => r.app_version).filter(Boolean));
+      setStat('total', total);
+      setStat('with_gps', withGps);
+      setStat('with_gps_pct', total ? `${Math.round((withGps / total) * 100)}% located` : '—');
+      setStat('devices', devices.size);
+      setStat('versions', versions.size ? `${versions.size} app version${versions.size === 1 ? '' : 's'}` : '—');
+      if (rows.length) {
+        const latest = rows[0].recorded_at || rows[0].created_at;
+        setStat('last_relative', relative(latest));
+        setStat('last_absolute', fmt.format(new Date(latest)));
+      } else {
+        setStat('last_relative', '—');
+        setStat('last_absolute', 'no entries');
+      }
+    }
+
+    // ── Chart: daily count, last 30 days ───────────────────────────────
+    function renderTimeline(rows) {
+      const days = 30;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const labels = [], buckets = [], keys = [];
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        keys.push(d.toISOString().slice(0, 10));
+        labels.push(d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
+        buckets.push(0);
+      }
+      rows.forEach(r => {
+        const ts = r.recorded_at || r.created_at;
+        if (!ts) return;
+        const k = new Date(ts).toISOString().slice(0, 10);
+        const idx = keys.indexOf(k);
+        if (idx >= 0) buckets[idx]++;
+      });
+      const ctx = document.getElementById('chart-timeline').getContext('2d');
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+      const tickColor = isDark ? '#8A8F9A' : '#6B6B6B';
+      if (window.__timelineChart) window.__timelineChart.destroy();
+      window.__timelineChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Feedback', data: buckets, backgroundColor: '#C75B39', hoverBackgroundColor: '#A94B2E', borderRadius: 4, maxBarThickness: 16 }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { displayColors: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: tickColor, maxRotation: 0, autoSkip: true, autoSkipPadding: 14, font: { size: 10 } } },
+            y: { beginAtZero: true, ticks: { color: tickColor, stepSize: 1, precision: 0 }, grid: { color: gridColor } },
+          },
+        },
+      });
+    }
+
+    // ── Map ────────────────────────────────────────────────────────────
+    let mapInstance = null, markerLayer = null;
+    function renderMap(rows) {
+      const geo = rows.filter(r => r.latitude != null && r.longitude != null);
+      document.getElementById('map-count').textContent = geo.length ? `${geo.length} located` : '';
+      if (!mapInstance) {
+        mapInstance = L.map('map', { scrollWheelZoom: false }).setView(RACE_START, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19, attribution: '&copy; OpenStreetMap contributors',
+        }).addTo(mapInstance);
+        markerLayer = L.layerGroup().addTo(mapInstance);
+      } else {
+        markerLayer.clearLayers();
+      }
+      const bounds = [];
+      geo.forEach(r => {
+        const latlng = [r.latitude, r.longitude];
+        bounds.push(latlng);
+        const m = L.circleMarker(latlng, { radius: 8, fillColor: '#C75B39', color: '#fff', weight: 2, fillOpacity: 0.9 });
+        // Build popup DOM safely
+        const popup = document.createElement('div');
+        const strong = document.createElement('strong');
+        const t = r.transcript || '';
+        strong.textContent = `"${t.length > 160 ? t.slice(0, 160) + '…' : t}"`;
+        const ts = document.createElement('div');
+        ts.className = 'ts';
+        const when = r.recorded_at || r.created_at;
+        ts.textContent = `${fmt.format(new Date(when))} · ${r.device || 'unknown'}`;
+        popup.appendChild(strong);
+        popup.appendChild(ts);
+        m.bindPopup(popup);
+        markerLayer.addLayer(m);
+      });
+      if (bounds.length) mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+      else mapInstance.setView(RACE_START, 13);
+    }
+
+    // ── Device filter ──────────────────────────────────────────────────
+    function renderDeviceFilter(rows) {
+      const sel = document.getElementById('filter-device');
+      const current = sel.value;
+      const devices = Array.from(new Set(rows.map(r => r.device).filter(Boolean))).sort();
+      clear(sel);
+      sel.appendChild(el('option', { attrs: { value: '' }, text: 'All devices' }));
+      devices.forEach(d => {
+        const opt = el('option', { attrs: { value: d }, text: d });
+        if (d === current) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.onchange = () => renderTranscripts(window.__lastRows || []);
+    }
+
+    // ── Transcripts ────────────────────────────────────────────────────
+    function iconTag(pathD) {
+      const svg = svgNS('svg', { 'class': 'w-3.5 h-3.5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' });
+      const p = svgNS('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: pathD });
+      svg.appendChild(p);
+      return svg;
+    }
+    function pinSvg() {
+      const svg = svgNS('svg', { 'class': 'w-3.5 h-3.5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' });
+      const circle = svgNS('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M15 10.5a3 3 0 11-6 0 3 3 0 016 0z' });
+      const pin = svgNS('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z' });
+      svg.appendChild(pin);
+      svg.appendChild(circle);
+      return svg;
+    }
+    function deviceSvg() {
+      const svg = svgNS('svg', { 'class': 'w-3.5 h-3.5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' });
+      const rect = svgNS('rect', { x: '7', y: '2', width: '10', height: '20', rx: '2' });
+      const line = svgNS('line', { x1: '11', y1: '18', x2: '13', y2: '18' });
+      svg.appendChild(rect); svg.appendChild(line);
+      return svg;
+    }
+
+    function buildTranscriptCard(r) {
+      const when = r.recorded_at || r.created_at;
+      const transcript = r.transcript || '(empty transcript)';
+      const hasGps = r.latitude != null && r.longitude != null;
+      const km = (typeof r.distance_km === 'number' && r.distance_km > 0.05) ? `KM ${r.distance_km.toFixed(2)}` : null;
+
+      const article = el('article', { class: 'bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-sand-dark/30 hover:border-terracotta/40 hover:shadow-md transition-all' });
+      const row = el('div', { class: 'flex items-start gap-4' });
+      const quote = el('div', { class: 'quote-mark', attrs: { 'aria-hidden': 'true' } });
+      quote.textContent = '\u201C';
+      const body = el('div', { class: 'flex-1 min-w-0' });
+      const p = el('p', { class: 'text-stone leading-relaxed text-[15px] md:text-base mb-4', text: transcript });
+      const meta = el('div', { class: 'flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-stone-light' });
+
+      const tsSpan = el('span', { class: 'font-mono', title: fmt.format(new Date(when)), text: relative(when) });
+      meta.appendChild(tsSpan);
+
+      if (r.device) {
+        const devSpan = el('span', { class: 'inline-flex items-center gap-1.5' });
+        devSpan.appendChild(deviceSvg());
+        devSpan.appendChild(document.createTextNode(r.device));
+        meta.appendChild(devSpan);
+      }
+      if (r.app_version) {
+        meta.appendChild(el('span', { class: 'inline-flex items-center gap-1.5 font-mono opacity-80', text: `v${r.app_version}` }));
+      }
+      if (km) {
+        meta.appendChild(el('span', { class: 'inline-flex items-center gap-1.5 text-terracotta font-semibold', text: km }));
+      }
+      if (hasGps) {
+        const link = el('a', {
+          class: 'inline-flex items-center gap-1 text-sea hover:text-sea-dark',
+          href: `https://www.google.com/maps?q=${r.latitude},${r.longitude}`,
+          target: '_blank',
+          rel: 'noopener',
+        });
+        link.appendChild(pinSvg());
+        link.appendChild(document.createTextNode('map'));
+        meta.appendChild(link);
+      } else {
+        meta.appendChild(el('span', { class: 'text-stone-light/60', text: 'no GPS' }));
+      }
+
+      body.appendChild(p);
+      body.appendChild(meta);
+      row.appendChild(quote);
+      row.appendChild(body);
+      article.appendChild(row);
+      return article;
+    }
+
+    function renderTranscripts(rows) {
+      const container = document.getElementById('transcripts');
+      const empty = document.getElementById('empty-state');
+      const deviceFilter = document.getElementById('filter-device').value;
+      let list = rows;
+      if (deviceFilter) list = list.filter(r => r.device === deviceFilter);
+      clear(container);
+      if (!list.length) { empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      const frag = document.createDocumentFragment();
+      list.forEach(r => frag.appendChild(buildTranscriptCard(r)));
+      container.appendChild(frag);
+    }
+
+    // ── Nav scroll shadow ──────────────────────────────────────────────
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) nav.classList.add('shadow-sm'); else nav.classList.remove('shadow-sm');
+    }, { passive: true });
+
+    // ── Go ─────────────────────────────────────────────────────────────
+    document.getElementById('build-ts').textContent = new Date().toISOString().slice(0, 16).replace('T', ' ');
+    loadData(false);
+    setInterval(() => loadData(false), 90_000);
+  </script>
+</body>
+</html>
